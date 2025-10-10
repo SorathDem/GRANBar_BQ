@@ -1,4 +1,4 @@
-import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES} from "./config.js";
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_REPORTE_MENSUAL } from "./config.js";
 
 const fechaInput = document.getElementById("fecha");
 const buscarBtn = document.getElementById("buscar");
@@ -7,41 +7,31 @@ const reporteDiarioBtn = document.getElementById("reporteDiario");
 const reporteMensualBtn = document.getElementById("reporteMensual");
 const tablaBody = document.querySelector("#tablaOrdenes tbody");
 const totalDiaDiv = document.getElementById("totalDia");
+const logoutBtn = document.getElementById("logoutBtn");
 
 // 🕓 Función para convertir fecha al horario de Colombia
 function convertirFechaColombia(fechaISO) {
   const fecha = new Date(fechaISO);
-  return fecha.toLocaleDateString("es-CO", {
-    timeZone: "America/Bogota",
-  });
+  return fecha.toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 }
 
+// 🚪 Cerrar sesión
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("token");
   window.location.href = "login.html";
 });
 
-// 🔍 Buscar órdenes por fecha (ajustando a hora de Colombia)
+// 🔍 Buscar órdenes por fecha
 buscarBtn.addEventListener("click", async () => {
   const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) {
-    alert("Por favor selecciona una fecha.");
-    return;
-  }
+  if (!fechaSeleccionada) return alert("Por favor selecciona una fecha.");
 
   try {
-    // ✅ Ajustar la fecha seleccionada a la zona horaria de Colombia
     const fechaColombia = new Date(`${fechaSeleccionada}T00:00:00-05:00`);
     const fechaISO = fechaColombia.toISOString().split("T")[0]; // YYYY-MM-DD
 
     const response = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("⚠️ Error al buscar órdenes:", response.status, response.statusText);
-      console.error("🧩 Respuesta del servidor:", errorText);
-      alert(`Error al buscar órdenes: ${response.statusText}`);
-      return;
-    }
+    if (!response.ok) throw new Error(await response.text());
 
     const ordenes = await response.json();
 
@@ -85,10 +75,7 @@ function renderOrdenes(ordenes) {
 // 💰 Cerrar caja
 cerrarCajaBtn.addEventListener("click", async () => {
   const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) {
-    alert("Selecciona una fecha antes de cerrar la caja.");
-    return;
-  }
+  if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
 
   const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
   if (!confirmacion) return;
@@ -97,54 +84,37 @@ cerrarCajaBtn.addEventListener("click", async () => {
     const response = await fetch(`${API_BASE}/cerrar-caja`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fecha: fechaSeleccionada })
+      body: JSON.stringify({ fecha: fechaSeleccionada }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("⚠️ Error al cerrar caja:", response.status, response.statusText);
-      console.error("🧩 Contenido de la respuesta del servidor:", errorText);
-      alert(`Error al cerrar caja: ${response.statusText}`);
-      return;
-    }
+    if (!response.ok) throw new Error(await response.text());
 
     const data = await response.json();
     console.log("✅ Caja cerrada con éxito:", data);
 
-    if (data.caja) {
-      alert(`✅ Caja cerrada con éxito.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
-    } else {
-      alert("⚠️ Caja cerrada, pero sin datos de total.");
-    }
+    alert(`✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
   } catch (error) {
     console.error("💥 Error cerrando caja:", error);
-    alert("❌ Error al cerrar la caja (ver consola para más detalles).");
+    alert("❌ Error al cerrar la caja.");
   }
 });
 
-// 📅 Reporte diario (envía correo con PDF)
+// 📅 Reporte diario
 reporteDiarioBtn.addEventListener("click", async () => {
   const fechaInputValor = fechaInput.value;
-  if (!fechaInputValor) {
-    alert("Selecciona una fecha para generar el reporte diario.");
-    return;
-  }
+  if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
 
-  const correoDestino = prompt(
-    "Introduce el correo donde enviar el reporte:",
-    "santiagoacostaavila2905@gmail.com"
-  );
+  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "santiagoacostaavila2905@gmail.com");
   if (!correoDestino) return;
 
-  // ✅ Ajustar la fecha seleccionada al horario de Colombia
   const fechaColombia = new Date(`${fechaInputValor}T00:00:00-05:00`);
 
   try {
-    const response = await fetch(`${API_URL}/api/reportes/reporte-diario`, {
+    const response = await fetch(API_REPORTES, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        fecha: fechaColombia.toISOString(), // ✅ Enviamos en formato ISO correcto
+        fecha: fechaColombia.toISOString(),
         correo: correoDestino,
         tipo: "diario",
       }),
@@ -156,11 +126,7 @@ reporteDiarioBtn.addEventListener("click", async () => {
       alert(`📧 Reporte diario enviado correctamente a ${correoDestino}`);
     } else {
       console.error("⚠️ Error en reporte diario:", data);
-      if (data.error === "No hay órdenes para esa fecha") {
-        alert("❌ No hay órdenes registradas para la fecha seleccionada.");
-      } else {
-        alert("❌ Error al generar o enviar el reporte diario.");
-      }
+      alert(data.error || "❌ Error al generar o enviar el reporte diario.");
     }
   } catch (error) {
     console.error("💥 Error reporte diario:", error);
@@ -168,19 +134,16 @@ reporteDiarioBtn.addEventListener("click", async () => {
   }
 });
 
-// 📆 Reporte mensual (envía correo con PDF)
+// 📆 Reporte mensual
 reporteMensualBtn.addEventListener("click", async () => {
   const mes = prompt("Introduce el mes (YYYY-MM):");
   if (!mes) return;
 
-  const correoDestino = prompt(
-    "Introduce el correo donde enviar el reporte:",
-    "dueno@restaurante.com"
-  );
+  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "dueno@restaurante.com");
   if (!correoDestino) return;
 
   try {
-    const response = await fetch(API_REPORTES, {
+    const response = await fetch(API_REPORTE_MENSUAL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -196,7 +159,7 @@ reporteMensualBtn.addEventListener("click", async () => {
       alert(`📧 Reporte mensual enviado correctamente a ${correoDestino}`);
     } else {
       console.error("⚠️ Error en reporte mensual:", data);
-      alert("❌ Error al generar o enviar el reporte mensual.");
+      alert(data.error || "❌ Error al generar o enviar el reporte mensual.");
     }
   } catch (error) {
     console.error("💥 Error reporte mensual:", error);

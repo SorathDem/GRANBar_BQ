@@ -4,6 +4,13 @@ import fs from "fs";
 
 const router = express.Router();
 
+// 🔁 Redirige /api/reportes → /api/reportes/reporte-diario
+router.post("/", (req, res, next) => {
+  req.url = "/reporte-diario";
+  next();
+});
+
+// 🧾 Ruta principal para generar reporte diario
 router.post("/reporte-diario", async (req, res) => {
   try {
     const { ordenes } = req.body;
@@ -22,8 +29,7 @@ router.post("/reporte-diario", async (req, res) => {
     doc.pipe(stream);
 
     // 🧾 ENCABEZADO
-    doc
-      .text("Reporte DIARIO de Ventas", { align: "center" });
+    doc.text("Reporte DIARIO de Ventas", { align: "center" });
     doc
       .moveDown(0.5)
       .font("Helvetica")
@@ -91,7 +97,7 @@ router.post("/reporte-diario", async (req, res) => {
       .font("Helvetica-Oblique")
       .fontSize(8)
       .fillColor("#777777")
-      .text("Generado automaticamente por el sistema de reportes del restaurante", {
+      .text("Generado automáticamente por el sistema de reportes del restaurante", {
         align: "right",
       });
 
@@ -100,7 +106,7 @@ router.post("/reporte-diario", async (req, res) => {
     stream.on("finish", () => {
       res.download(rutaArchivo, nombreArchivo, (err) => {
         if (err) console.error("Error al enviar el archivo:", err);
-        fs.unlinkSync(rutaArchivo); // Eliminar despues de enviar
+        fs.unlinkSync(rutaArchivo); // Eliminar después de enviar
       });
     });
   } catch (error) {
