@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel del Mesero</title>
+  <link rel="stylesheet" href="styles/mesero.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+
+    header {
+      background-color: #222;
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    main {
+      padding: 20px;
+      display: flex;
+      gap: 40px;
+    }
+
+    section {
+      flex: 1;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .productos-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .producto-card {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      background-color: #fefefe;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.2s;
+    }
+
+    .producto-card:hover {
+      transform: scale(1.02);
+    }
+
+    .producto-card button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .producto-card button:hover {
+      background-color: #0056b3;
+    }
+
+    .orden-lista {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .orden-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    .mesa-input {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .mesa-input label {
+      font-weight: bold;
+    }
+
+    
+    .mesa-input input {
+      width: 100px;
+      padding: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .btn-enviar {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin-top: 15px;
+      width: 100%;
+    }
+
+    .btn-enviar:hover {
+      background-color: #218838;
+    }
+
+    .notificacion {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 6px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.4s, transform 0.4s;
+      font-size: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .notificacion.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Panel del Mesero</h1>
+    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+  </header>
+  
+  <input 
+  type="text" 
+  id="buscador" 
+  placeholder="🔍 Buscar producto o categoría..."
+  class="buscador"
+/>
+
+  <main>
+    <!-- Sección de productos -->
+    <section class="productos">
+      <h2>Productos disponibles</h2>
+      <div class="productos-scroll" id="productos-container">
+        <!-- Los productos se cargarán aquí -->
+      </div>
+    </section>
+
+    <!-- Sección de orden -->
+    <section class="orden">
+      <h2>Orden actual</h2>
+
+      <div id="orden-lista" class="orden-lista"></div>
+
+      <!-- Número de mesa -->
+    <div class="mesa-input">
+      <label for="mesa">Mesa:</label>
+      <select id="mesa">
+        <option value="">Seleccionar...</option>
+        <!-- Genera mesas del 1 al 20 -->
+        <script>
+          for (let i = 1; i <= 20; i++) {
+            document.write(`<option value="${i}">Mesa ${i}</option>`);
+          }
+        </script>
+      </select>
+    </div>
+
+
+      <button id="enviarOrdenBtn" class="btn-enviar">Enviar orden</button>
+    </section>
+  </main>
+
+  <!-- Notificación -->
+  <div id="notificacion" class="notificacion"></div>
+
+  <script src="mesero.js"></script>
+
+  <script>
+    // 👇 Control automático del scroll
+    const contenedor = document.getElementById("productos-container");
+    const observer = new MutationObserver(() => {
+      if (contenedor.scrollHeight > contenedor.clientHeight) {
+        contenedor.style.overflowY = "scroll";
+      } else {
+        contenedor.style.overflowY = "hidden";
+      }
+    });
+    observer.observe(contenedor, { childList: true });
+
+    // 🔹 Función del botón "Cerrar sesión"
+   // 🔹 Cerrar sesión
+    logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+    });
+
+    // 🔔 Sistema de notificaciones visuales
+    function mostrarNotificacion(mensaje, color = "#007bff") {
+      const noti = document.getElementById("notificacion");
+      noti.textContent = mensaje;
+      noti.style.backgroundColor = color;
+      noti.classList.add("visible");
+
+      setTimeout(() => {
+        noti.classList.remove("visible");
+      }, 2500);
+    }
+
+    // Exponer la función globalmente para usarla en mesero.js
+    window.mostrarNotificacion = mostrarNotificacion;
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caja</title>
+  <link rel="stylesheet" href="styles/admin.css">
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background: #f9f9f9;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      color: #0984e3;
+      text-align: center;
+    }
+
+    .filtros {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    input[type="date"],
+    select {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #0984e3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #0984e3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
+
+    th {
+      background: #0984e3;
+      color: white;
+    }
+
+    .acciones {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .total {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #0984e3;
+      margin-top: 15px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+    <header>
+        <nav>
+        <ul>
+            <li><a href="admin.html" id="nav-productos">Productos</a></li>
+            <li><a href="caja.html" id="nav-caja">Caja</a></li>
+            <li><button id="logoutBtn">Cerrar sesión</button></li>
+        </ul>
+        </nav>
+    </header>
+
+  <h1>📦 Caja</h1>
+
+  <div class="filtros">
+    <label for="fecha">Seleccionar fecha:</label>
+    <input type="date" id="fecha" />
+    <button id="buscar">Buscar Órdenes</button>
+  </div>
+
+  <table id="tablaOrdenes">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Productos</th>
+        <th>Total</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="total" id="totalDia"></div>
+
+  <div class="acciones">
+    <button id="cerrarCaja">Cerrar Caja</button>
+    <button id="reporteDiario">Reporte Diario</button>
+    <button id="reporteMensual">Reporte Mensual</button>
+  </div>
+
+  <script src="./caja.js"></script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+/* === Estilos generales === */
+body {
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f6f7fb;
+  margin: 0;
+  color: #333;
+}
+
+header {
+  background: #212529;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+header h1 {
+  font-size: 1.5rem;
+}
+
+header button {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+header button:hover {
+  background: #c0392b;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* === Sección Productos === */
+.productos {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.productos-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.product-card {
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+  min-width: 200px;
+  flex-shrink: 0;
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.product-card:hover {
+  transform: translateY(-3px);
+}
+
+.product-card h4 {
+  margin: 6px 0;
+  color: #333;
+}
+
+.product-card p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.product-card button {
+  margin-top: 8px;
+  background: #2ecc71;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.product-card button:hover {
+  background: #27ae60;
+}
+
+/* === Sección Orden === */
+.orden {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#ordenTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#ordenTable th, #ordenTable td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.cantidad-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.cantidad-control button {
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.cantidad-control button:hover {
+  background: #2980b9;
+}
+
+.btn-quitar {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.btn-quitar:hover {
+  background: #c0392b;
+}
+
+.btn-enviar {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-enviar:hover {
+  background: #1e8449;
+}
+
+/* === Notificación === */
+.notificacion {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #27ae60;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s ease;
+}
+
+#buscador {
+  width: 70%;
+  margin-top: 20px;
+  margin-left: 40px;
+  padding: 0.7rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s;
+}
+
+#buscador:focus {
+  position: center;
+  border-color: #0984e3;
+  box-shadow: 0 0 5px #74b9ff;
+}
+
+.notificacion.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hidden {
+  display: none;
+}
