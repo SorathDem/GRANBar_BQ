@@ -1,4 +1,4 @@
-import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_REPORTE_MENSUAL } from "./config.js";
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES } from "./config.js";
 
 const fechaInput = document.getElementById("fecha");
 const buscarBtn = document.getElementById("buscar");
@@ -104,7 +104,10 @@ reporteDiarioBtn.addEventListener("click", async () => {
   const fechaInputValor = fechaInput.value;
   if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
 
-  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "santiagoacostaavila2905@gmail.com");
+  const correoDestino = prompt(
+    "Introduce el correo donde enviar el reporte:",
+    "santiagoacostaavila2905@gmail.com"
+  );
   if (!correoDestino) return;
 
   const fechaColombia = new Date(`${fechaInputValor}T00:00:00-05:00`);
@@ -143,7 +146,7 @@ reporteMensualBtn.addEventListener("click", async () => {
   if (!correoDestino) return;
 
   try {
-    const response = await fetch(API_REPORTE_MENSUAL, {
+    const response = await fetch(API_REPORTES, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
