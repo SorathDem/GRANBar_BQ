@@ -1,4 +1,4 @@
-import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES } from "./config.js";
+import { API_URL } from "./config.js";
 
 const token = localStorage.getItem("token");
 
@@ -31,26 +31,41 @@ logoutBtn.addEventListener("click", () => {
 
 // 🔹 Cargar productos
 async function loadProductos() {
-  const res = await fetch(API_URL, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  const productos = await res.json();
-  renderProductos(productos);
+  try {
+    const res = await fetch(API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!res.ok) throw new Error("Error al cargar productos");
+
+    const productos = await res.json();
+    renderProductos(productos);
+  } catch (err) {
+    console.error("💥 Error cargando productos:", err);
+  }
 }
 
+// 🔹 Renderizar productos
 function renderProductos(productos) {
   tableBody.innerHTML = "";
-  productos.forEach(p => {
+
+  productos.forEach((p) => {
     const row = document.createElement("tr");
+
     row.innerHTML = `
       <td>${p.name}</td>
       <td>${p.price}</td>
       <td>${p.stock}</td>
       <td>
-        <button onclick="editProducto('${p._id}')">✏️</button>
-        <button onclick="deleteProducto('${p._id}')">🗑️</button>
+        <button class="btn-edit">✏️</button>
+        <button class="btn-delete">🗑️</button>
       </td>
     `;
+
+    // ✅ Agregar listeners a los botones
+    row.querySelector(".btn-edit").addEventListener("click", () => editProducto(p._id));
+    row.querySelector(".btn-delete").addEventListener("click", () => deleteProducto(p._id));
+
     tableBody.appendChild(row);
   });
 }
@@ -58,15 +73,23 @@ function renderProductos(productos) {
 // 🔹 Buscar en vivo
 searchBox.addEventListener("input", async () => {
   const q = searchBox.value.toLowerCase();
-  const res = await fetch(API_URL, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  const productos = await res.json();
-  const filtrados = productos.filter(p =>
-    p.name.toLowerCase().includes(q) ||
-    (p.category || "").toLowerCase().includes(q)
-  );
-  renderProductos(filtrados);
+
+  try {
+    const res = await fetch(API_URL, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error("Error al buscar productos");
+
+    const productos = await res.json();
+    const filtrados = productos.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q)
+    );
+    renderProductos(filtrados);
+  } catch (err) {
+    console.error("💥 Error buscando productos:", err);
+  }
 });
 
 // 🔹 Abrir modal para agregar producto
@@ -93,62 +116,78 @@ productForm.addEventListener("submit", async (e) => {
     category: categoryInput.value,
     name: nameInput.value,
     price: Number(priceInput.value),
-    stock: Number(stockInput.value)
+    stock: Number(stockInput.value),
   };
 
-  if (productIdInput.value) {
-    // Actualizar
-    await fetch(`${API_URL}/${productIdInput.value}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-  } else {
-    // Crear
-    await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(data)
-    });
-  }
+  try {
+    const url = productIdInput.value
+      ? `${API_URL}/${productIdInput.value}`
+      : API_URL;
 
-  modal.classList.add("hidden");
-  loadProductos();
+    const method = productIdInput.value ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) throw new Error("Error guardando producto");
+
+    modal.classList.add("hidden");
+    loadProductos();
+  } catch (err) {
+    console.error("💥 Error guardando producto:", err);
+    alert("No se pudo guardar el producto.");
+  }
 });
 
 // 🔹 Editar producto
 async function editProducto(id) {
-  const res = await fetch(`${API_URL}/${id}`, {
-    headers: { "Authorization": `Bearer ${token}` }
-  });
-  const producto = await res.json();
+  try {
+    const res = await fetch(`${API_URL}/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-  modalTitle.textContent = "Editar Producto";
-  productIdInput.value = producto._id;
-  categoryInput.value = producto.category;
-  nameInput.value = producto.name;
-  priceInput.value = producto.price;
-  stockInput.value = producto.stock;
+    if (!res.ok) throw new Error("No se pudo obtener el producto");
 
-  modal.classList.remove("hidden");
+    const producto = await res.json();
+
+    modalTitle.textContent = "Editar Producto";
+    productIdInput.value = producto._id;
+    categoryInput.value = producto.category;
+    nameInput.value = producto.name;
+    priceInput.value = producto.price;
+    stockInput.value = producto.stock;
+
+    modal.classList.remove("hidden");
+  } catch (error) {
+    console.error("💥 Error al editar producto:", error);
+    alert("No se pudo cargar el producto.");
+  }
 }
 
 // 🔹 Eliminar producto
 async function deleteProducto(id) {
-  if (confirm("¿Seguro que deseas eliminar este producto?")) {
-    await fetch(`${API_URL}/${id}`, {
+  if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+
+  try {
+    const res = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
-      headers: { "Authorization": `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (!res.ok) throw new Error("No se pudo eliminar el producto");
+
     loadProductos();
+  } catch (error) {
+    console.error("💥 Error eliminando producto:", error);
+    alert("No se pudo eliminar el producto.");
   }
 }
 
-// Llamar al inicio
+// 🔹 Inicializar
 loadProductos();
