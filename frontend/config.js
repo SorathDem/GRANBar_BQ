@@ -1,5 +1,5 @@
 // 🌐 Cambia solo esta línea si cambias de entorno:
-const BASE_URL = "https://granbar-backend.onrender.com/api";
+const BASE_URL = "https://granbar-bq.onrender.com/api";
 
 export const API_URL = `${BASE_URL}/productos`;
 export const API_BASE = `${BASE_URL}/ordenes`;
