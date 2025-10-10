@@ -140,7 +140,7 @@ reporteDiarioBtn.addEventListener("click", async () => {
   const fechaColombia = new Date(`${fechaInputValor}T00:00:00-05:00`);
 
   try {
-    const response = await fetch(API_REPORTES, {
+    const response = await fetch(`${API_URL}/api/reportes/reporte-diario`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
