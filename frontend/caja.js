@@ -1,5 +1,5 @@
-const API_BASE = "http://localhost:5000/api/ordenes";
-const API_REPORTES = "http://localhost:5000/api/reportes/enviar";
+const API_BASE = "https://granbar-backend.onrender.com/api/ordenes";
+const API_REPORTES = "https://granbar-backend.onrender.com/api/reportes/enviar";
 
 const fechaInput = document.getElementById("fecha");
 const buscarBtn = document.getElementById("buscar");

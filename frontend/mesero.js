@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/productos"; // 🔥 Ajusta si tu backend usa otro puerto o ruta base
+const API_URL = "https://granbar-backend.onrender.com/api/productos";// 🔥 Ajusta si tu backend usa otro puerto o ruta base
 
 const productosContainer = document.getElementById("productos-container");
 const ordenLista = document.getElementById("orden-lista");
@@ -131,7 +131,7 @@ document.getElementById("enviarOrdenBtn").addEventListener("click", async () => 
   };
 
   try {
-    const resp = await fetch("http://localhost:5000/api/ordenes", {
+    const resp = await fetch("https://granbar-backend.onrender.com/api/ordenes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)

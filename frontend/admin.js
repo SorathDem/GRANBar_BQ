@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/productos"; // tu backend
+const API_URL = "https://granbar-backend.onrender.com/api/productos"; // tu backend
 const token = localStorage.getItem("token");
 
 // Si no hay token, redirigir a login
