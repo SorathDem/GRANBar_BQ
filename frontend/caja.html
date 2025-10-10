@@ -44,7 +44,7 @@
     }
 
     button:hover {
-      background-color: #0984e3;
+      background-color: #065cb4;
     }
 
     table {
@@ -80,15 +80,15 @@
   </style>
 </head>
 <body>
-    <header>
-        <nav>
-        <ul>
-            <li><a href="admin.html" id="nav-productos">Productos</a></li>
-            <li><a href="caja.html" id="nav-caja">Caja</a></li>
-            <li><button id="logoutBtn">Cerrar sesión</button></li>
-        </ul>
-        </nav>
-    </header>
+  <header>
+    <nav>
+      <ul>
+        <li><a href="admin.html" id="nav-productos">Productos</a></li>
+        <li><a href="caja.html" id="nav-caja">Caja</a></li>
+        <li><button id="logoutBtn">Cerrar sesión</button></li>
+      </ul>
+    </nav>
+  </header>
 
   <h1>📦 Caja</h1>
 
@@ -119,6 +119,7 @@
     <button id="reporteMensual">Reporte Mensual</button>
   </div>
 
-  <script src="./caja.js"></script>
+  <!-- 👇 Usa módulo para permitir imports en caja.js -->
+  <script type="module" src="./caja.js"></script>
 </body>
 </html>

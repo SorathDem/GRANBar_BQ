@@ -99,9 +99,8 @@
       font-weight: bold;
     }
 
-    
-    .mesa-input input {
-      width: 100px;
+    .mesa-input select {
+      width: 120px;
       padding: 5px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -148,13 +147,13 @@
     <h1>Panel del Mesero</h1>
     <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
   </header>
-  
+
   <input 
-  type="text" 
-  id="buscador" 
-  placeholder="🔍 Buscar producto o categoría..."
-  class="buscador"
-/>
+    type="text" 
+    id="buscador" 
+    placeholder="🔍 Buscar producto o categoría..."
+    class="buscador"
+  />
 
   <main>
     <!-- Sección de productos -->
@@ -172,19 +171,10 @@
       <div id="orden-lista" class="orden-lista"></div>
 
       <!-- Número de mesa -->
-    <div class="mesa-input">
-      <label for="mesa">Mesa:</label>
-      <select id="mesa">
-        <option value="">Seleccionar...</option>
-        <!-- Genera mesas del 1 al 20 -->
-        <script>
-          for (let i = 1; i <= 20; i++) {
-            document.write(`<option value="${i}">Mesa ${i}</option>`);
-          }
-        </script>
-      </select>
-    </div>
-
+      <div class="mesa-input">
+        <label for="mesa">Mesa:</label>
+        <select id="mesa"></select>
+      </div>
 
       <button id="enviarOrdenBtn" class="btn-enviar">Enviar orden</button>
     </section>
@@ -193,28 +183,26 @@
   <!-- Notificación -->
   <div id="notificacion" class="notificacion"></div>
 
-  <script src="mesero.js"></script>
+  <!-- ✅ Importa mesero.js como módulo -->
+  <script type="module" src="./mesero.js"></script>
 
   <script>
-    // 👇 Control automático del scroll
-    const contenedor = document.getElementById("productos-container");
-    const observer = new MutationObserver(() => {
-      if (contenedor.scrollHeight > contenedor.clientHeight) {
-        contenedor.style.overflowY = "scroll";
-      } else {
-        contenedor.style.overflowY = "hidden";
-      }
-    });
-    observer.observe(contenedor, { childList: true });
+    // Generar mesas dinámicamente (ya no con document.write)
+    const mesaSelect = document.getElementById("mesa");
+    for (let i = 1; i <= 20; i++) {
+      const option = document.createElement("option");
+      option.value = i;
+      option.textContent = `Mesa ${i}`;
+      mesaSelect.appendChild(option);
+    }
 
-    // 🔹 Función del botón "Cerrar sesión"
-   // 🔹 Cerrar sesión
+    // 🔹 Cerrar sesión
     logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
     });
 
-    // 🔔 Sistema de notificaciones visuales
+    // 🔔 Sistema de notificaciones
     function mostrarNotificacion(mensaje, color = "#007bff") {
       const noti = document.getElementById("notificacion");
       noti.textContent = mensaje;
@@ -226,7 +214,7 @@
       }, 2500);
     }
 
-    // Exponer la función globalmente para usarla en mesero.js
+    // Exponer función global
     window.mostrarNotificacion = mostrarNotificacion;
   </script>
 </body>
