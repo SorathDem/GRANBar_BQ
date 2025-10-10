@@ -1,3 +1,5 @@
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_URL } from "./config.js";
+
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -6,7 +8,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   errorBox.textContent = ""; // limpiar errores
 
   try {
-    const res = await fetch("https://granbar-backend.onrender.com/api/auth/login", {
+    const res = await fetch(API_AUTH_LOGIN, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ code })

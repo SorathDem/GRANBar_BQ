@@ -1,5 +1,4 @@
-const API_BASE = "https://granbar-backend.onrender.com/api/ordenes";
-const API_REPORTES = "https://granbar-backend.onrender.com/api/reportes/enviar";
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_URL } from "./config.js";
 
 const fechaInput = document.getElementById("fecha");
 const buscarBtn = document.getElementById("buscar");

@@ -1,4 +1,5 @@
-const API_URL = "https://granbar-backend.onrender.com/api/productos"; // tu backend
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_URL } from "./config.js";
+
 const token = localStorage.getItem("token");
 
 // Si no hay token, redirigir a login
