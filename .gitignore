@@ -44,7 +44,6 @@ bower_components
 .yarn-integrity
 .dataconnect
 
-.github/workflows
 # === Dependencias ===
 node_modules/
 
@@ -65,8 +64,8 @@ tmp/
 .DS_Store
 Thumbs.db
 
-# === GitHub (opcional, si no usas Actions o flujos automatizados) ===
-# .github/
+# === GitHub (ignorar carpeta de configuración) ===
+.github/
 
 # === Archivos de frontend ===
 frontend/node_modules/
