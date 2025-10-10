@@ -104,29 +104,30 @@ reporteDiarioBtn.addEventListener("click", async () => {
   const fechaInputValor = fechaInput.value;
   if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
 
-  const correoDestino = prompt(
-    "Introduce el correo donde enviar el reporte:",
-    "santiagoacostaavila2905@gmail.com"
-  );
+  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "santiagoacostaavila2905@gmail.com");
   if (!correoDestino) return;
 
-  const fechaColombia = new Date(`${fechaInputValor}T00:00:00-05:00`);
-
   try {
-    const response = await fetch(API_REPORTES, {
+    // 1️⃣ Primero obtenemos las órdenes del día
+    const ordenesResp = await fetch(`${API_BASE}/por-fecha/${fechaInputValor}`);
+    const ordenes = await ordenesResp.json();
+
+    if (!Array.isArray(ordenes) || ordenes.length === 0) {
+      alert("❌ No hay órdenes para esa fecha.");
+      return;
+    }
+
+    // 2️⃣ Luego enviamos esas órdenes al backend de reportes
+    const response = await fetch(`${API_REPORTES}/reporte-diario`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fecha: fechaColombia.toISOString(),
-        correo: correoDestino,
-        tipo: "diario",
-      }),
+      body: JSON.stringify({ ordenes, correo: correoDestino }),
     });
 
     const data = await response.json();
 
     if (response.ok) {
-      alert(`📧 Reporte diario enviado correctamente a ${correoDestino}`);
+      alert(`📧 Reporte diario generado y enviado a ${correoDestino}`);
     } else {
       console.error("⚠️ Error en reporte diario:", data);
       alert(data.error || "❌ Error al generar o enviar el reporte diario.");
