@@ -1,4 +1,4 @@
-import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_URL } from "./config.js";
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES } from "./config.js";
 
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -9,11 +9,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
 
   try {
     const res = await fetch(API_AUTH_LOGIN, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ code })
-})
-
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
 
     const data = await res.json();
 
@@ -26,7 +25,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     localStorage.setItem("token", data.token);
     localStorage.setItem("role", data.role);
 
-    // Redirigir según el rol
+    // 🔀 Redirigir según el rol
     if (data.role === "caja") {
       window.location.href = "admin.html";
     } else if (data.role === "mesero") {

@@ -1,4 +1,4 @@
-import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES, API_URL } from "./config.js";
+import { API_AUTH_LOGIN, API_URL, API_BASE, API_REPORTES } from "./config.js";
 
 const token = localStorage.getItem("token");
 
