@@ -16,19 +16,24 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Rutas principales
 app.use("/api/auth", AuthRoutes);
 app.use("/api/productos", ProductRoutes);
 app.use("/api/ordenes", OrderRoutes);
 app.use("/api/reportes", ReportRoutes);
 
+// 🟢 Ruta raíz (para Render o prueba directa)
+app.get("/", (req, res) => {
+  res.send("🚀 API del restaurante funcionando correctamente.");
+});
+
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
   .then(() => console.log("✅ MongoDB conectado"))
-  .catch(err => console.error("❌ Error de conexión:", err));
+  .catch((err) => console.error("❌ Error de conexión:", err));
 
 // Puerto dinámico (Render asigna uno automáticamente)
 const PORT = process.env.PORT || 5000;
