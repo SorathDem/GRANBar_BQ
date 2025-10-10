@@ -100,6 +100,7 @@ cerrarCajaBtn.addEventListener("click", async () => {
 });
 
 // 📅 Reporte diario
+// 📅 Reporte diario
 reporteDiarioBtn.addEventListener("click", async () => {
   const fechaInputValor = fechaInput.value;
   if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
@@ -108,7 +109,7 @@ reporteDiarioBtn.addEventListener("click", async () => {
   if (!correoDestino) return;
 
   try {
-    // 1️⃣ Primero obtenemos las órdenes del día
+    // 1️⃣ Obtener órdenes del día
     const ordenesResp = await fetch(`${API_BASE}/por-fecha/${fechaInputValor}`);
     const ordenes = await ordenesResp.json();
 
@@ -117,26 +118,32 @@ reporteDiarioBtn.addEventListener("click", async () => {
       return;
     }
 
-    // 2️⃣ Luego enviamos esas órdenes al backend de reportes
+    // 2️⃣ Generar el reporte (recibimos PDF, no JSON)
     const response = await fetch(`${API_REPORTES}/reporte-diario`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ordenes, correo: correoDestino }),
     });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      alert(`📧 Reporte diario generado y enviado a ${correoDestino}`);
-    } else {
-      console.error("⚠️ Error en reporte diario:", data);
-      alert(data.error || "❌ Error al generar o enviar el reporte diario.");
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("⚠️ Error en reporte diario:", errorText);
+      alert("❌ Error al generar el reporte diario.");
+      return;
     }
+
+    // 3️⃣ Recibimos el PDF como blob y lo abrimos en una nueva pestaña
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url, "_blank");
+
+    alert(`📧 Reporte diario generado y enviado a ${correoDestino}`);
   } catch (error) {
     console.error("💥 Error reporte diario:", error);
     alert("❌ Error al enviar el reporte diario.");
   }
 });
+
 
 // 📆 Reporte mensual
 reporteMensualBtn.addEventListener("click", async () => {
