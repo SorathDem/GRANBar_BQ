@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "flask": "^0.2.10"
   },
