@@ -1,4 +1,3 @@
-// ✅ URL de la API en Render
 const API_CAJAS = "https://granbar-bq.onrender.com/api/cajas";
 
 const tbody = document.getElementById("tbodyCierres");
@@ -11,49 +10,41 @@ async function cargarCierres() {
 
     const data = await res.json();
 
-    // Si no hay registros
-    if (data.length === 0) {
+    // Vaciar tabla antes de agregar filas nuevas
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(data) || data.length === 0) {
       mensaje.textContent = "No hay cierres de caja registrados aún.";
       return;
     }
 
     mensaje.textContent = "";
 
-    // Llenar tabla con datos
     data.forEach(caja => {
       const fila = document.createElement("tr");
 
-      // 🔹 Formatear fecha correctamente
-      const fecha = new Date(caja.fecha).toLocaleDateString("es-CO", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
-      });
+      // Validaciones seguras
+      const fechaCaja = caja.fecha ? new Date(caja.fecha) : null;
+      const totalDia = caja.totalDia || 0;
+      const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
-      // 🔹 Crear fila con botón
+      const fechaFormateada = fechaCaja
+        ? fechaCaja.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
+        : "Sin fecha";
+
       fila.innerHTML = `
-        <td>${fecha}</td>
-        <td>$${Number(caja.totalDia || 0).toLocaleString("es-CO")}</td>
-        <td>${caja.cantidadOrdenes || 0}</td>
-        <td>
-          <button onclick="verDetalle('${caja.fecha}')">Ver Detalle</button>
-        </td>
+        <td>${fechaFormateada}</td>
+        <td>$${totalDia.toLocaleString("es-CO")}</td>
+        <td>${cantidadOrdenes}</td>
       `;
 
       tbody.appendChild(fila);
     });
-
   } catch (error) {
     console.error("❌ Error:", error);
     mensaje.textContent = "Ocurrió un error al cargar los cierres.";
   }
 }
 
-// 🔹 Función para redirigir a caja.html con la fecha seleccionada
-function verDetalle(fecha) {
-  const fechaISO = new Date(fecha).toISOString().split("T")[0]; // yyyy-mm-dd
-  window.location.href = `./caja.html?fecha=${fechaISO}`;
-}
-
 // Ejecutar al cargar la página
-cargarCierres();
+document.addEventListener("DOMContentLoaded", cargarCierres);
