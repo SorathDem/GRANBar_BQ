@@ -28,7 +28,7 @@ header button {
 }
 
 header button:hover {
-  background: #c0392b;
+  background: transparent;
 }
 
 main {
