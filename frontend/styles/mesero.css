@@ -53,6 +53,7 @@ main {
   overflow-x: auto;
   gap: 16px;
   padding: 10px 0;
+  scroll-snap-type: x mandatory;
 }
 
 .product-card {
@@ -65,6 +66,7 @@ main {
   text-align: center;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s;
+  scroll-snap-align: start;
 }
 
 .product-card:hover {
@@ -164,20 +166,7 @@ main {
   background: #1e8449;
 }
 
-/* === Notificación === */
-.notificacion {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #27ae60;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 8px;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.4s ease;
-}
-
+/* === Buscador === */
 #buscador {
   width: 70%;
   margin-top: 20px;
@@ -196,6 +185,21 @@ main {
   box-shadow: 0 0 5px #74b9ff;
 }
 
+/* === Notificación === */
+.notificacion {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #27ae60;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.4s ease;
+  z-index: 999;
+}
+
 .notificacion.show {
   opacity: 1;
   transform: translateY(0);
@@ -203,4 +207,102 @@ main {
 
 .hidden {
   display: none;
+}
+
+/* === MEDIA QUERIES === */
+
+/* 📱 Móviles pequeños (hasta 600px) */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  header h1 {
+    font-size: 1.2rem;
+  }
+
+  #buscador {
+    width: 90%;
+    margin: 10px auto;
+    display: block;
+  }
+
+  main {
+    padding: 10px;
+    gap: 20px;
+  }
+
+  .productos {
+    padding: 10px;
+  }
+
+  .product-card {
+    min-width: 150px;
+    padding: 10px;
+  }
+
+  .product-card h4 {
+    font-size: 1rem;
+  }
+
+  .product-card p {
+    font-size: 0.8rem;
+  }
+
+  .orden {
+    padding: 10px;
+    overflow-x: auto;
+  }
+
+  #ordenTable th, #ordenTable td {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+
+  .btn-enviar {
+    width: 100%;
+  }
+
+  .notificacion {
+    bottom: 10px;
+    right: 10px;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+}
+
+/* 📱 Móviles medianos (601px - 900px) */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+  }
+
+  #buscador {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .productos-scroll {
+    gap: 12px;
+  }
+
+  .product-card {
+    min-width: 180px;
+  }
+}
+
+/* 💻 Pantallas grandes (más de 1200px) */
+@media (min-width: 1200px) {
+  main {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  #buscador {
+    width: 60%;
+  }
 }

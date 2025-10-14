@@ -30,9 +30,9 @@ function mostrarProductos(lista) {
     card.classList.add("producto-card");
 
     card.innerHTML = `
-      <p> ${producto.category}
-          ${producto.name}  
-          $${producto.price} 
+      <p> ${producto.name} 
+          ${producto.category} 
+          $${producto.price} </p>
       <button class="agregarBtn">Agregar</button>
     `;
 
