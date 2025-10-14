@@ -4,122 +4,59 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cierres de Caja</title>
-  <link rel="stylesheet" href="assets/css/main.css" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
     body {
-      font-family: "Segoe UI", sans-serif;
-      background: #f6f7fb;
+      font-family: Arial, sans-serif;
+      background: #fafafa;
       margin: 0;
-    }
-
-    header {
-      background: #212529;
-      color: #fff;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 25px;
-    }
-
-    header h1 {
-      font-size: 1.4rem;
-    }
-
-    header button {
-      background: #e74c3c;
-      border: none;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    main {
       padding: 20px;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    h1 {
+      text-align: center;
+      color: #222;
     }
-
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
     th, td {
+      border: 1px solid #ddd;
       padding: 12px;
       text-align: center;
-      border-bottom: 1px solid #eee;
     }
-
     th {
-      background: #3498db;
+      background: #333;
       color: white;
     }
-
-    tr:hover {
-      background-color: #f9f9f9;
+    tr:nth-child(even) {
+      background: #f9f9f9;
     }
-
-    button.consultar-btn {
-      background: #27ae60;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 6px 12px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button.consultar-btn:hover {
-      background: #1e8449;
-    }
-
-    /* Responsive */
-    @media (max-width: 700px) {
-      table {
-        font-size: 0.9rem;
-      }
-      th, td {
-        padding: 8px;
-      }
-      header {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-      }
+    #mensaje {
+      text-align: center;
+      color: #888;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <nav>
-      <ul>
-        <li><a href="admin.html" id="nav-productos">Productos</a></li>
-        <li><a href="caja.html" id="nav-caja">Caja</a></li>
-        <li><a href="cierre_caja.html" id="nav-caja">Caja</a></li>
-        <li><button id="logoutBtn">Cerrar sesión</button></li>
-      </ul>
-    </nav>
-  </header>
+  <h1>📦 Cierres de Caja</h1>
 
-  <main>
-    <table>
-      <thead>
-        <tr>
-          <th>Fecha</th>
-          <th>Total del Día</th>
-          <th>Órdenes</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody id="tablaCierres">
-        <tr><td colspan="4">Cargando cierres de caja...</td></tr>
-      </tbody>
-    </table>
-  </main>
+  <table id="tablaCierres">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Total del Día</th>
+        <th>Cantidad de Órdenes</th>
+      </tr>
+    </thead>
+    <tbody id="tbodyCierres"></tbody>
+  </table>
 
-  <script type="module" src="./cierre_caja.js"></script>
+  <p id="mensaje">Cargando datos...</p>
+
+  <script src="js/cierre_caja.js"></script>
 </body>
 </html>

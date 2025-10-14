@@ -9,6 +9,7 @@ import AuthRoutes from "./routes/AuthRoutes.js";
 import ProductRoutes from "./routes/ProductRoutes.js";
 import OrderRoutes from "./routes/OrderRoutes.js";
 import ReportRoutes from "./routes/ReportRoutes.js";
+import CajaRoutes from "./routes/CajaRoutes.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/productos", ProductRoutes);
 app.use("/api/ordenes", OrderRoutes);
 app.use("/api/reportes", ReportRoutes);
+app.use("/api/cajas", CajaRoutes);
 
 // === Conexión a MongoDB ===
 mongoose
