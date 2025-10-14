@@ -86,6 +86,8 @@
       margin-bottom: 10px;
       border-bottom: 1px solid #eee;
       padding-bottom: 8px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
     .mesa-input {
@@ -121,24 +123,27 @@
       background-color: #218838;
     }
 
+    /* 🔔 Notificación */
     .notificacion {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background-color: #007bff;
+      background: #3498db;
       color: white;
-      padding: 10px 15px;
-      border-radius: 6px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
       opacity: 0;
-      transform: translateY(20px);
-      transition: opacity 0.4s, transform 0.4s;
-      font-size: 15px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      animation: fadeInOut 2.5s forwards;
+      z-index: 9999;
     }
 
-    .notificacion.visible {
-      opacity: 1;
-      transform: translateY(0);
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(20px); }
+      10%, 90% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(20px); }
     }
   </style>
 </head>
@@ -159,9 +164,7 @@
     <!-- Sección de productos -->
     <section class="productos">
       <h2>Productos disponibles</h2>
-      <div class="productos-scroll" id="productos-container">
-        <!-- Los productos se cargarán aquí -->
-      </div>
+      <div class="productos-scroll" id="productos-container"></div>
     </section>
 
     <!-- Sección de orden -->
@@ -180,42 +183,7 @@
     </section>
   </main>
 
-  <!-- Notificación -->
-  <div id="notificacion" class="notificacion"></div>
-
-  <!-- ✅ Importa mesero.js como módulo -->
+  <!-- ✅ Solo importamos el JS (toda la lógica está ahí) -->
   <script type="module" src="./mesero.js"></script>
-
-  <script>
-    // Generar mesas dinámicamente (ya no con document.write)
-    const mesaSelect = document.getElementById("mesa");
-    for (let i = 1; i <= 20; i++) {
-      const option = document.createElement("option");
-      option.value = i;
-      option.textContent = `Mesa ${i}`;
-      mesaSelect.appendChild(option);
-    }
-
-    // 🔹 Cerrar sesión
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-    });
-
-    // 🔔 Sistema de notificaciones
-    function mostrarNotificacion(mensaje, color = "#007bff") {
-      const noti = document.getElementById("notificacion");
-      noti.textContent = mensaje;
-      noti.style.backgroundColor = color;
-      noti.classList.add("visible");
-
-      setTimeout(() => {
-        noti.classList.remove("visible");
-      }, 2500);
-    }
-
-    // Exponer función global
-    window.mostrarNotificacion = mostrarNotificacion;
-  </script>
 </body>
 </html>

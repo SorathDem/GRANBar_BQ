@@ -3,41 +3,43 @@ import { API_AUTH_LOGIN, API_BASE, API_REPORTES, API_URL } from "./config.js";
 const productosContainer = document.getElementById("productos-container");
 const ordenLista = document.getElementById("orden-lista");
 const enviarOrdenBtn = document.getElementById("enviarOrdenBtn");
+const logoutBtn = document.getElementById("logoutBtn");
 
 // Array donde se guarda la orden actual
 let orden = [];
-let productosGlobal = []; // guardará todos los productos cargados
+let productosGlobal = [];
 
 // 🔹 1. Cargar productos desde MongoDB
 async function cargarProductos() {
   try {
     const response = await fetch(API_URL);
     const productos = await response.json();
-
-    productosGlobal = productos; // guardar todos los productos
-    mostrarProductos(productosGlobal); // renderizar productos
+    productosGlobal = productos;
+    mostrarProductos(productosGlobal);
   } catch (error) {
     console.error("Error al cargar productos:", error);
   }
 }
 
-// 🔹 Función que renderiza productos en el contenedor
+// 🔹 Función que renderiza productos
 function mostrarProductos(lista) {
-  productosContainer.innerHTML = ""; // limpiar antes de renderizar
+  productosContainer.innerHTML = "";
 
   lista.forEach((producto) => {
     const card = document.createElement("div");
     card.classList.add("producto-card");
 
     card.innerHTML = `
-      <p><strong>Nombre:</strong>${producto.name} <strong>Categoría:</strong> ${producto.category} <strong>Precio:</strong> $${producto.price} <strong>Stock:</strong> ${producto.stock}</p>
+      <p><strong>Nombre:</strong> ${producto.name} 
+      <strong>Categoría:</strong> ${producto.category} 
+      <strong>Precio:</strong> $${producto.price} 
+      <strong>Stock:</strong> ${producto.stock}</p>
       <button class="agregarBtn">Agregar</button>
     `;
 
-    // Evento para agregar producto a la orden
     card.querySelector(".agregarBtn").addEventListener("click", () => {
       agregarAOrden(producto);
-      mostrarNotificacion(`✅ ${producto.name} agregado a la orden`);
+      mostrarNotificacion(`✅ ${producto.name} agregado a la orden`, "#27ae60");
     });
 
     productosContainer.appendChild(card);
@@ -47,17 +49,15 @@ function mostrarProductos(lista) {
 // 🔹 2. Agregar producto a la orden
 function agregarAOrden(producto) {
   const existente = orden.find((p) => p._id === producto._id);
-
   if (existente) {
     existente.cantidad++;
   } else {
     orden.push({ ...producto, cantidad: 1, nota: "" });
   }
-
   renderOrden();
 }
 
-// 🔹 3. Renderizar la lista de orden
+// 🔹 3. Renderizar la orden
 function renderOrden() {
   ordenLista.innerHTML = "";
 
@@ -76,13 +76,9 @@ function renderOrden() {
       <button class="quitarBtn">❌ Quitar</button>
     `;
 
-    // Eventos
     item.querySelector(".menos").addEventListener("click", () => {
-      if (producto.cantidad > 1) {
-        producto.cantidad--;
-      } else {
-        orden.splice(index, 1);
-      }
+      if (producto.cantidad > 1) producto.cantidad--;
+      else orden.splice(index, 1);
       renderOrden();
     });
 
@@ -105,36 +101,35 @@ function renderOrden() {
 }
 
 // 🔹 4. Enviar la orden
-document.getElementById("enviarOrdenBtn").addEventListener("click", async () => {
+enviarOrdenBtn.addEventListener("click", async () => {
   if (orden.length === 0) {
     mostrarNotificacion("⚠️ No hay productos en la orden", "#f39c12");
     return;
   }
 
-  const mesaInput = document.getElementById("mesa").value.trim();
-
-  if (!mesaInput) {
-    mostrarNotificacion("⚠️ Debes seleccionar una mesa antes de enviar la orden", "#f39c12");
+  const mesa = document.getElementById("mesa").value;
+  if (!mesa) {
+    mostrarNotificacion("⚠️ Debes seleccionar una mesa", "#f39c12");
     return;
   }
 
   const payload = {
-    mesa: mesaInput,
-    productos: orden.map(it => ({
+    mesa,
+    productos: orden.map((it) => ({
       _id: it._id,
-      tipo: it.category || "", 
+      tipo: it.category || "",
       nombre: it.name,
       cantidad: it.cantidad,
       precio: it.price,
-      recomendaciones: it.nota || ""
-    }))
+      recomendaciones: it.nota || "",
+    })),
   };
 
   try {
     const resp = await fetch(API_BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
 
     if (resp.ok) {
@@ -144,7 +139,6 @@ document.getElementById("enviarOrdenBtn").addEventListener("click", async () => 
       setTimeout(() => location.reload(), 1500);
     } else {
       mostrarNotificacion("❌ Error al enviar la orden", "#e74c3c");
-      console.error("Error respuesta:", await resp.text());
     }
   } catch (err) {
     console.error(err);
@@ -152,33 +146,43 @@ document.getElementById("enviarOrdenBtn").addEventListener("click", async () => 
   }
 });
 
-// 🔹 5. Filtro en tiempo real (barra de búsqueda)
+// 🔹 5. Filtro en tiempo real
 const buscador = document.getElementById("buscador");
 if (buscador) {
   buscador.addEventListener("input", () => {
     const texto = buscador.value.toLowerCase().trim();
-
-    // 🔎 Filtrar productos ya cargados
-    const productosFiltrados = productosGlobal.filter((p) => {
-      const nombre = p.name.toLowerCase();
-      const categoria = p.category.toLowerCase();
-      return nombre.includes(texto) || categoria.includes(texto);
-    });
-
-    mostrarProductos(productosFiltrados);
+    const filtrados = productosGlobal.filter((p) =>
+      p.name.toLowerCase().includes(texto) ||
+      p.category.toLowerCase().includes(texto)
+    );
+    mostrarProductos(filtrados);
   });
 }
 
-// 🔹 6. Notificaciones
+// 🔹 6. Cerrar sesión
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+});
+
+// 🔹 7. Generar mesas dinámicamente
+const mesaSelect = document.getElementById("mesa");
+for (let i = 1; i <= 20; i++) {
+  const option = document.createElement("option");
+  option.value = i;
+  option.textContent = `Mesa ${i}`;
+  mesaSelect.appendChild(option);
+}
+
+// 🔹 8. Notificaciones
 function mostrarNotificacion(mensaje, color = "#3498db") {
   const noti = document.createElement("div");
   noti.classList.add("notificacion");
   noti.textContent = mensaje;
   noti.style.background = color;
-
   document.body.appendChild(noti);
   setTimeout(() => noti.remove(), 2500);
 }
 
-// 🔹 7. Iniciar carga
+// 🔹 9. Inicializar
 cargarProductos();
