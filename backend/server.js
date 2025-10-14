@@ -15,22 +15,24 @@ dotenv.config();
 
 const app = express();
 
-// === CORS CONFIGURADO CORRECTAMENTE ===
+// === CORS CONFIGURADO ===
+// Permite tu frontend de Render y localhost para pruebas
 const allowedOrigins = [
-  "https://granbar-bq.onrender.com", // tu frontend en Render
-  "http://localhost:5500",           // para desarrollo local (opcional)
+  "https://granbar-bq.onrender.com", // frontend en Render
+  "http://localhost:5500",           // desarrollo local
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true); // Postman o CURL
+      if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("CORS no permitido para este origen"));
       }
     },
-    credentials: true,
+    credentials: true, // permite cookies si las necesitas
   })
 );
 
@@ -45,18 +47,26 @@ app.use("/api/reportes", ReportRoutes);
 app.use("/api/cajas", CajaRoutes);
 
 // === Conexión a MongoDB ===
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB conectado"))
-  .catch((err) => console.error("❌ Error de conexión:", err));
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB conectado");
+  } catch (err) {
+    console.error("❌ Error de conexión a MongoDB:", err);
+    process.exit(1); // detiene la app si no hay conexión
+  }
+};
+connectDB();
 
-// === Servir frontend (solo si ambos están juntos) ===
+// === Servir frontend estático (opcional) ===
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../frontend")));
+
+// Si no encuentra ruta API, devuelve frontend
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/login.html"));
 });
