@@ -31,6 +31,7 @@ function mostrarProductos(lista) {
 
     card.innerHTML = `
       <p> ${producto.name} 
+          ${producto.category} 
           $${producto.price} </p>
       <button class="agregarBtn">Agregar</button>
     `;
@@ -64,7 +65,7 @@ function renderOrden() {
     item.classList.add("orden-item");
 
     item.innerHTML = `
-      <p><strong>${producto.name}</strong> - $${producto.price}</p>
+      <p><strong>${producto.name}</strong> (${producto.category}) - $${producto.price}</p>
       <textarea placeholder="Recomendaciones..." data-index="${index}">${producto.nota}</textarea>
       <div class="cantidad-control">
         <button class="menos">−</button>
