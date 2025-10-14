@@ -9,7 +9,7 @@ const tablaBody = document.querySelector("#tablaOrdenes tbody");
 const totalDiaDiv = document.getElementById("totalDia");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// 🕓 Función para convertir fecha al horario de Colombia
+// 🕓 Convertir fecha al horario de Colombia
 function convertirFechaColombia(fechaISO) {
   const fecha = new Date(fechaISO);
   return fecha.toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
@@ -22,9 +22,11 @@ logoutBtn.addEventListener("click", () => {
 });
 
 // 🔍 Buscar órdenes por fecha
-buscarBtn.addEventListener("click", async () => {
-  const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) return alert("Por favor selecciona una fecha.");
+async function buscarOrdenesPorFecha(fechaSeleccionada) {
+  if (!fechaSeleccionada) {
+    alert("Por favor selecciona una fecha.");
+    return;
+  }
 
   try {
     const fechaColombia = new Date(`${fechaSeleccionada}T00:00:00-05:00`);
@@ -46,9 +48,13 @@ buscarBtn.addEventListener("click", async () => {
     console.error("💥 Error al buscar órdenes:", error);
     alert("❌ Error al buscar las órdenes del día.");
   }
+}
+
+buscarBtn.addEventListener("click", () => {
+  buscarOrdenesPorFecha(fechaInput.value);
 });
 
-// 🧾 Renderizar órdenes en la tabla
+// 🧾 Renderizar órdenes
 function renderOrdenes(ordenes) {
   tablaBody.innerHTML = "";
   let total = 0;
@@ -100,7 +106,6 @@ cerrarCajaBtn.addEventListener("click", async () => {
 });
 
 // 📅 Reporte diario
-// 📅 Reporte diario
 reporteDiarioBtn.addEventListener("click", async () => {
   const fechaInputValor = fechaInput.value;
   if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
@@ -109,7 +114,6 @@ reporteDiarioBtn.addEventListener("click", async () => {
   if (!correoDestino) return;
 
   try {
-    // 1️⃣ Obtener órdenes del día
     const ordenesResp = await fetch(`${API_BASE}/por-fecha/${fechaInputValor}`);
     const ordenes = await ordenesResp.json();
 
@@ -118,7 +122,6 @@ reporteDiarioBtn.addEventListener("click", async () => {
       return;
     }
 
-    // 2️⃣ Generar el reporte (recibimos PDF, no JSON)
     const response = await fetch(`${API_REPORTES}/reporte-diario`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -132,7 +135,6 @@ reporteDiarioBtn.addEventListener("click", async () => {
       return;
     }
 
-    // 3️⃣ Recibimos el PDF como blob y lo abrimos en una nueva pestaña
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     window.open(url, "_blank");
@@ -143,7 +145,6 @@ reporteDiarioBtn.addEventListener("click", async () => {
     alert("❌ Error al enviar el reporte diario.");
   }
 });
-
 
 // 📆 Reporte mensual
 reporteMensualBtn.addEventListener("click", async () => {
@@ -175,5 +176,16 @@ reporteMensualBtn.addEventListener("click", async () => {
   } catch (error) {
     console.error("💥 Error reporte mensual:", error);
     alert("❌ Error al enviar el reporte mensual.");
+  }
+});
+
+// 🔄 Auto-cargar fecha desde cierre_caja.html
+window.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const fechaURL = params.get("fecha"); // Ejemplo: ?fecha=2025-10-14
+
+  if (fechaURL) {
+    fechaInput.value = fechaURL;
+    buscarOrdenesPorFecha(fechaURL);
   }
 });

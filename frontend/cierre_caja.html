@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cierres de Caja</title>
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f6f7fb;
+      margin: 0;
+    }
+
+    header {
+      background: #212529;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 25px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+    }
+
+    header button {
+      background: #e74c3c;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #3498db;
+      color: white;
+    }
+
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+
+    button.consultar-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button.consultar-btn:hover {
+      background: #1e8449;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      table {
+        font-size: 0.9rem;
+      }
+      th, td {
+        padding: 8px;
+      }
+      header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📊 Cierres de Caja</h1>
+    <button id="logoutBtn">Cerrar Sesión</button>
+  </header>
+
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Total del Día</th>
+          <th>Órdenes</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaCierres">
+        <tr><td colspan="4">Cargando cierres de caja...</td></tr>
+      </tbody>
+    </table>
+  </main>
+
+  <script type="module" src="./cierre_caja.js"></script>
+</body>
+</html>

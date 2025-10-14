@@ -118,6 +118,7 @@ tbody tr:hover {
 
 button {
   cursor: pointer;
+  margin-top: auto;
 }
 
 button.edit-btn {
