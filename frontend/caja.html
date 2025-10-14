@@ -185,8 +185,6 @@
         const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
         fila.innerHTML = `
-          <td>${orden._id || "N/A"}</td>
-          <td>${orden.cliente || "N/A"}</td>
           <td>${productos}</td>
           <td>$${orden.total.toLocaleString()}</td>
           <td>${fechaLocal}</td>
