@@ -31,8 +31,7 @@ function mostrarProductos(lista) {
 
     card.innerHTML = `
       <p> ${producto.name} 
-          $${producto.price} 
-           ${producto.stock}</p>
+          $${producto.price}</p>
       <button class="agregarBtn">Agregar</button>
     `;
 
