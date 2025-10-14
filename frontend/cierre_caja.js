@@ -1,4 +1,4 @@
-import { API_BASE } from "./config.js";
+import { API_BASE,  API_CAJAS } from "./config.js";
 
 // 🔹 Verificamos que los elementos existan antes de usarlos
 const tablaCierres = document.getElementById("tablaCierres");
@@ -22,7 +22,7 @@ async function cargarCierres() {
   try {
     console.log(`📡 Cargando cierres desde: ${API_BASE}/cierres`);
 
-    const resp = await fetch(`${API_BASE}/cierres`, {
+    const resp = await fetch(`${API_CAJAS}/cierres`, {
       headers: { "Content-Type": "application/json" },
     });
 
