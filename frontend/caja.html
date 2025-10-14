@@ -118,6 +118,113 @@
   </div>
 
   <!-- 👇 Usa módulo para permitir imports en caja.js -->
-  <script type="module" src="./caja.js"></script>
+  <script type="module">
+    import { API_BASE } from "./config.js";
+
+    const fechaInput = document.getElementById("fecha");
+    const buscarBtn = document.getElementById("buscar");
+    const cerrarCajaBtn = document.getElementById("cerrarCaja");
+    const tablaBody = document.querySelector("#tablaOrdenes tbody");
+    const totalDiaDiv = document.getElementById("totalDia");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // 🔓 Cerrar sesión
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.href = "login.html";
+    });
+
+    // 🧭 Capturar fecha desde URL (ej: ?fecha=2025-10-14)
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const fechaURL = params.get("fecha");
+
+      if (fechaURL) {
+        fechaInput.value = fechaURL;
+        buscarOrdenesPorFecha(fechaURL);
+      }
+    });
+
+    // 🔍 Buscar órdenes por fecha
+    async function buscarOrdenesPorFecha(fechaSeleccionada) {
+      if (!fechaSeleccionada) {
+        alert("Por favor selecciona una fecha.");
+        return;
+      }
+
+      try {
+        const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`).toISOString().split("T")[0];
+        const response = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
+        if (!response.ok) throw new Error(await response.text());
+
+        const ordenes = await response.json();
+
+        if (!Array.isArray(ordenes) || ordenes.length === 0) {
+          tablaBody.innerHTML = `<tr><td colspan="5">No se encontraron órdenes para esa fecha</td></tr>`;
+          totalDiaDiv.textContent = "";
+          return;
+        }
+
+        renderOrdenes(ordenes);
+      } catch (error) {
+        console.error("Error al buscar órdenes:", error);
+        alert("❌ Error al buscar las órdenes del día.");
+      }
+    }
+
+    buscarBtn.addEventListener("click", () => {
+      buscarOrdenesPorFecha(fechaInput.value);
+    });
+
+    // 🧾 Renderizar órdenes
+    function renderOrdenes(ordenes) {
+      tablaBody.innerHTML = "";
+      let total = 0;
+
+      ordenes.forEach((orden) => {
+        const fila = document.createElement("tr");
+        const productos = orden.items.map((p) => `${p.nombre} (${p.cantidad})`).join(", ");
+        const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
+
+        fila.innerHTML = `
+          <td>${orden._id || "N/A"}</td>
+          <td>${orden.cliente || "N/A"}</td>
+          <td>${productos}</td>
+          <td>$${orden.total.toLocaleString()}</td>
+          <td>${fechaLocal}</td>
+        `;
+
+        total += orden.total;
+        tablaBody.appendChild(fila);
+      });
+
+      totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
+    }
+
+    // 💰 Cerrar caja
+    cerrarCajaBtn.addEventListener("click", async () => {
+      const fechaSeleccionada = fechaInput.value;
+      if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
+
+      const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
+      if (!confirmacion) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/cerrar-caja`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fecha: fechaSeleccionada }),
+        });
+
+        if (!response.ok) throw new Error(await response.text());
+
+        const data = await response.json();
+        alert(`✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
+      } catch (error) {
+        console.error("Error cerrando caja:", error);
+        alert("❌ Error al cerrar la caja.");
+      }
+    });
+  </script>
 </body>
 </html>

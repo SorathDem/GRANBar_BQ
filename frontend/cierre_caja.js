@@ -10,7 +10,6 @@ async function cargarCierres() {
 
     const data = await res.json();
 
-    // Vaciar tabla antes de agregar filas nuevas
     tbody.innerHTML = "";
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -23,7 +22,6 @@ async function cargarCierres() {
     data.forEach(caja => {
       const fila = document.createElement("tr");
 
-      // Validaciones seguras
       const fechaCaja = caja.fecha ? new Date(caja.fecha) : null;
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
@@ -32,11 +30,27 @@ async function cargarCierres() {
         ? fechaCaja.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
         : "Sin fecha";
 
+      // 🔗 Botón para ver órdenes del día
+      const botonVer = document.createElement("button");
+      botonVer.textContent = "Ver órdenes";
+      botonVer.addEventListener("click", () => {
+        if (fechaCaja) {
+          const fechaISO = fechaCaja.toISOString().split("T")[0]; // formato YYYY-MM-DD
+          window.location.href = `./ordenes_dia.html?fecha=${fechaISO}`;
+        } else {
+          alert("Fecha inválida para este cierre.");
+        }
+      });
+
       fila.innerHTML = `
         <td>${fechaFormateada}</td>
         <td>$${totalDia.toLocaleString("es-CO")}</td>
         <td>${cantidadOrdenes}</td>
       `;
+
+      const celdaBoton = document.createElement("td");
+      celdaBoton.appendChild(botonVer);
+      fila.appendChild(celdaBoton);
 
       tbody.appendChild(fila);
     });
@@ -46,5 +60,4 @@ async function cargarCierres() {
   }
 }
 
-// Ejecutar al cargar la página
 document.addEventListener("DOMContentLoaded", cargarCierres);
