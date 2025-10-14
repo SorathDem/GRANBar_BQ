@@ -7,12 +7,10 @@ body {
 }
 
 header {
-  background: #212529;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
+  background-color: #2d3436;
+  color: #fff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 header h1 {
@@ -20,7 +18,7 @@ header h1 {
 }
 
 header button {
-  background: #e74c3c;
+  background: transparent;
   border: none;
   color: white;
   padding: 8px 14px;
