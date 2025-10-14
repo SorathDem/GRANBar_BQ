@@ -36,7 +36,7 @@ async function cargarCierres() {
       botonVer.addEventListener("click", () => {
         if (fechaCaja) {
           const fechaISO = fechaCaja.toISOString().split("T")[0]; // formato YYYY-MM-DD
-          window.location.href = `./ordenes_dia.html?fecha=${fechaISO}`;
+          window.location.href = `./caja.html?fecha=${fechaISO}`;
         } else {
           alert("Fecha inválida para este cierre.");
         }
