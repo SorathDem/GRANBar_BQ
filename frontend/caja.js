@@ -179,13 +179,14 @@ reporteMensualBtn.addEventListener("click", async () => {
   }
 });
 
-// 🔄 Auto-cargar fecha desde cierre_caja.html
+// 🔄 Auto-cargar fecha desde cierre_caja.html (si viene con ?fecha=YYYY-MM-DD)
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const fechaURL = params.get("fecha"); // Ejemplo: ?fecha=2025-10-14
 
   if (fechaURL) {
     fechaInput.value = fechaURL;
+    // Buscar automáticamente las órdenes del día seleccionado
     buscarOrdenesPorFecha(fechaURL);
   }
 });
