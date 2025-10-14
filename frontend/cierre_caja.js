@@ -12,8 +12,27 @@ logoutBtn.addEventListener("click", () => {
 // 🔹 Cargar cierres de caja
 async function cargarCierres() {
   try {
-    const resp = await fetch(`${API_BASE}/cierres`);
-    if (!resp.ok) throw new Error(await resp.text());
+    console.log(`📡 Cargando cierres desde: ${API_BASE}/cierres`);
+
+    const resp = await fetch(`${API_BASE}/cierres`, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    // 🚨 Si el backend no responde con éxito
+    if (!resp.ok) {
+      const text = await resp.text();
+      console.error("⚠️ Respuesta no OK del servidor:", text);
+      throw new Error(`Error ${resp.status}: ${text}`);
+    }
+
+    // 🧠 Validar que realmente sea JSON
+    const contentType = resp.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await resp.text();
+      console.error("⚠️ El backend devolvió HTML en lugar de JSON:", text.slice(0, 200));
+      throw new Error("El backend devolvió HTML en lugar de JSON (revisa la URL o el servidor).");
+    }
+
     const cierres = await resp.json();
 
     if (!Array.isArray(cierres) || cierres.length === 0) {
@@ -22,9 +41,10 @@ async function cargarCierres() {
     }
 
     renderCierres(cierres);
+
   } catch (err) {
     console.error("💥 Error al cargar cierres:", err);
-    tablaCierres.innerHTML = `<tr><td colspan="4">❌ Error al cargar los cierres de caja</td></tr>`;
+    tablaCierres.innerHTML = `<tr><td colspan="4">❌ Error al cargar los cierres de caja<br><small>${err.message}</small></td></tr>`;
   }
 }
 
@@ -47,7 +67,7 @@ function renderCierres(cierres) {
     tablaCierres.appendChild(fila);
   });
 
-  // Agregar eventos a los botones
+  // 🔘 Agregar eventos a los botones
   document.querySelectorAll(".consultar-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const fecha = e.target.dataset.fecha;
