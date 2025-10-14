@@ -30,10 +30,9 @@ function mostrarProductos(lista) {
     card.classList.add("producto-card");
 
     card.innerHTML = `
-      <p><strong>Nombre:</strong> ${producto.name} 
-      <strong>Categoría:</strong> ${producto.category} 
-      <strong>Precio:</strong> $${producto.price} 
-      <strong>Stock:</strong> ${producto.stock}</p>
+      <p> ${producto.name} 
+          $${producto.price} 
+           ${producto.stock}</p>
       <button class="agregarBtn">Agregar</button>
     `;
 
@@ -66,7 +65,7 @@ function renderOrden() {
     item.classList.add("orden-item");
 
     item.innerHTML = `
-      <p><strong>${producto.name}</strong> (${producto.category}) - $${producto.price}</p>
+      <p><strong>${producto.name}</strong> - $${producto.price}</p>
       <textarea placeholder="Recomendaciones..." data-index="${index}">${producto.nota}</textarea>
       <div class="cantidad-control">
         <button class="menos">−</button>
