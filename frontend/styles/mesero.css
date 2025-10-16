@@ -15,7 +15,7 @@ header {
 }
 
 .btn-logout {
-  background: #dc3545;
+  background: transparent;
   border: none;
   color: white;
   padding: 6px 10px; /* más pequeño */
