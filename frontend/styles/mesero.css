@@ -14,13 +14,18 @@ header {
   padding: 12px 20px;
 }
 
+header h1 {
+  font-size: 1.4rem;
+}
+
 .btn-logout {
   background: #dc3545;
   border: none;
   color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 1rem;
 }
 
 .btn-logout:hover {
@@ -32,9 +37,9 @@ header {
   display: block;
   width: 90%;
   max-width: 600px;
-  margin: 20px auto;
-  padding: 10px 15px;
-  font-size: 16px;
+  margin: 15px auto;
+  padding: 12px 15px;
+  font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
@@ -42,16 +47,16 @@ header {
 
 .buscador:focus {
   border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
 }
 
 /* === LAYOUT PRINCIPAL === */
 main {
   display: flex;
-  flex-direction: column; /* 🔹 Coloca productos y orden uno debajo del otro */
-  gap: 30px;
-  padding: 20px;
-  max-width: 1200px;
+  flex-direction: column;
+  gap: 25px;
+  padding: 15px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -59,7 +64,7 @@ main {
 .productos {
   background-color: #fff;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
@@ -67,14 +72,14 @@ main {
   margin-bottom: 15px;
   color: #333;
   text-align: center;
+  font-size: 1.4rem;
 }
 
-/* Scroll de productos */
 .productos-scroll {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
+  gap: 15px;
+  max-height: 380px;
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 10px;
@@ -97,13 +102,14 @@ main {
 /* Tarjetas de producto */
 .producto-card {
   border: 1px solid #ddd;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 15px;
   background-color: #fefefe;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   transition: transform 0.2s;
+  font-size: 1rem;
 }
 
 .producto-card:hover {
@@ -114,9 +120,11 @@ main {
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 8px;
+  padding: 10px 14px;
   cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .producto-card button:hover {
@@ -127,7 +135,7 @@ main {
 .orden {
   background-color: #fff;
   padding: 20px;
-  border-radius: 12px;
+  border-radius: 15px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
@@ -135,14 +143,15 @@ main {
   margin-bottom: 15px;
   color: #333;
   text-align: center;
+  font-size: 1.4rem;
 }
 
 .orden-lista {
-  max-height: 250px;
+  max-height: 220px;
   overflow-y: auto;
   border: 1px solid #ddd;
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   margin-bottom: 15px;
 }
 
@@ -154,25 +163,30 @@ main {
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
+  font-size: 1rem;
 }
 
+/* Mesa */
 .mesa-input {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-top: 10px;
+  justify-content: center;
 }
 
 .mesa-input label {
   font-weight: bold;
+  font-size: 1rem;
 }
 
 .mesa-input select {
-  width: 120px;
-  padding: 5px;
-  border-radius: 6px;
+  width: 130px;
+  padding: 8px;
+  border-radius: 8px;
   border: 1px solid #ccc;
+  font-size: 1rem;
 }
 
 /* Botón enviar */
@@ -180,11 +194,13 @@ main {
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 10px;
+  padding: 12px 20px;
   cursor: pointer;
   margin-top: 15px;
   width: 100%;
+  font-size: 1.1rem;
+  font-weight: bold;
 }
 
 .btn-enviar:hover {
@@ -198,10 +214,10 @@ main {
   right: 20px;
   background: #3498db;
   color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
+  padding: 14px 22px;
+  border-radius: 12px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 1rem;
   box-shadow: 0 3px 8px rgba(0,0,0,0.2);
   opacity: 0;
   animation: fadeInOut 2.5s forwards;
@@ -214,17 +230,42 @@ main {
   100% { opacity: 0; transform: translateY(20px); }
 }
 
-/* === RESPONSIVE === */
+/* === RESPONSIVE (TELÉFONO / TABLET) === */
 @media (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+
+  main {
+    padding: 10px;
+    gap: 20px;
+  }
+
+  .productos, .orden {
+    padding: 18px;
+  }
+
+  .producto-card button,
+  .btn-enviar,
+  .btn-logout {
+    font-size: 1.1rem;
+    padding: 12px 20px;
+  }
+
   .productos-scroll {
-    max-height: 300px;
+    max-height: 65vh; /* se adapta al alto del teléfono */
   }
 
   .orden-lista {
-    max-height: 200px;
+    max-height: 40vh;
   }
 
-  .btn-enviar {
-    font-size: 15px;
+  header h1 {
+    font-size: 1.3rem;
+  }
+
+  .buscador {
+    font-size: 1rem;
+    padding: 12px;
   }
 }
