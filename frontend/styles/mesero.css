@@ -1,232 +1,51 @@
+/* 🔧 Ajustes responsivos mejorados */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;   /* ✅ Apila productos y orden */
+    gap: 25px;
+  }
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #f8f9fa;
-    }
+  section {
+    width: 100%;              /* ✅ Ocupa todo el ancho */
+    max-width: none;
+  }
 
-    header {
-      background: #212529;
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 20px;
-    }
+  .productos-scroll {
+    max-height: unset;        /* ✅ Permite scroll completo */
+  }
 
-    main {
-      padding: 20px;
-      display: flex;
-      gap: 40px;
-      flex-wrap: wrap;
-    }
+  /* 📱 Productos más grandes */
+  .producto-card {
+    padding: 18px;
+    font-size: 1.1rem;
+  }
 
-    section {
-      flex: 1;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      min-width: 320px;
-    }
+  .producto-nombre {
+    font-size: 1.25rem;
+  }
 
-    .productos-scroll {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
+  .producto-precio {
+    font-size: 1.05rem;
+  }
 
-    /* ✅ Tarjeta de producto compacta y responsive */
-    .producto-card {
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 12px 15px;
-      background-color: #fefefe;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      transition: transform 0.2s;
-    }
+  .producto-card button {
+    font-size: 1rem;
+    padding: 10px 16px;
+  }
 
-    .producto-card:hover {
-      transform: scale(1.02);
-    }
+  /* Buscador más grande y cómodo */
+  .buscador {
+    width: calc(100% - 20px);
+    margin: 10px;
+    padding: 12px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
 
-    .producto-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 150px;
-    }
-
-    .producto-nombre {
-      font-weight: bold;
-      font-size: 1.1rem;
-      color: #222;
-    }
-
-    .producto-precio {
-      color: #555;
-      font-size: 0.95rem;
-    }
-
-    .producto-card button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      font-size: 0.9rem;
-    }
-
-    .producto-card button:hover {
-      background-color: #0056b3;
-    }
-
-    .orden-lista {
-      max-height: 250px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    .orden-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .mesa-input {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .mesa-input label {
-      font-weight: bold;
-    }
-
-    .mesa-input select {
-      width: 120px;
-      padding: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-
-    .btn-enviar {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      cursor: pointer;
-      margin-top: 15px;
-      width: 100%;
-      font-size: 1rem;
-    }
-
-    .btn-enviar:hover {
-      background-color: #218838;
-    }
-
-    /* 🔔 Notificación */
-    .notificacion {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #3498db;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 16px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-      opacity: 0;
-      animation: fadeInOut 2.5s forwards;
-      z-index: 9999;
-    }
-
-    @keyframes fadeInOut {
-      0% { opacity: 0; transform: translateY(20px); }
-      10%, 90% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(20px); }
-    }
-
-    /* 📱 Diseño responsive */
-    @media (max-width: 768px) {
-      header h1 {
-        font-size: 1.3rem;
-      }
-
-      main {
-        flex-direction: column;
-        gap: 20px;
-        padding: 10px;
-      }
-
-      section {
-        padding: 15px;
-      }
-
-      .producto-card {
-        flex-direction: row;
-        align-items: center;
-      }
-
-      .producto-nombre {
-        font-size: 1rem;
-      }
-
-      .producto-precio {
-        font-size: 0.9rem;
-      }
-
-      .producto-card button {
-        padding: 6px 10px;
-        font-size: 0.85rem;
-      }
-
-      .buscador {
-        width: calc(100% - 20px);
-        margin: 10px;
-        padding: 10px;
-        font-size: 1rem;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-      }
-
-      .btn-enviar {
-        font-size: 1rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .producto-nombre {
-        font-size: 1.05rem;
-      }
-
-      .producto-card {
-        padding: 10px;
-      }
-
-      header {
-        flex-direction: column;
-        gap: 8px;
-        text-align: center;
-      }
-    }
+  /* Orden también más legible */
+  .btn-enviar {
+    font-size: 1.1rem;
+    padding: 12px;
+  }
+}
