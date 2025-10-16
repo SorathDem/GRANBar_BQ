@@ -286,7 +286,13 @@ main {
   }
 
   .productos-scroll {
-    justify-content: center;
+    display: flex;
+    flex-direction: column; 
+    overflow-y: auto;      
+    max-height: 500px;   
+    gap: 16px;
+    padding: 10px 0;
+    scroll-snap-type: y mandatory;
   }
 }
 
