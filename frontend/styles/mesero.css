@@ -287,12 +287,14 @@ main {
 
   .productos-scroll {
     display: flex;
-    flex-direction: column; 
-    overflow-y: auto;      
-    max-height: 500px;   
+    flex-direction: column;   /* Apila los productos hacia abajo */
+    overflow-y: auto;         /* Scroll vertical */
+    max-height: 600px;        /* Altura visible (ajústala a gusto) */
     gap: 16px;
     padding: 10px 0;
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y mandatory; /* Scroll suave hacia abajo */
+    scrollbar-width: thin;         /* Scrollbar más delgado en Firefox */
+    scrollbar-color: #0984e3 #f1f1f1; /* Colores del scroll */
   }
 }
 
