@@ -11,16 +11,17 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 8px 16px; /* reducido */
 }
 
 .btn-logout {
   background: #dc3545;
   border: none;
   color: white;
-  padding: 8px 14px;
+  padding: 6px 10px; /* más pequeño */
   border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .btn-logout:hover {
@@ -30,11 +31,11 @@ header {
 /* === BUSCADOR === */
 .buscador {
   display: block;
-  width: 90%;
-  max-width: 600px;
-  margin: 20px auto;
-  padding: 10px 15px;
-  font-size: 16px;
+  width: 85%;
+  max-width: 500px; /* reducido */
+  margin: 15px auto;
+  padding: 8px 12px; /* más pequeño */
+  font-size: 15px;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
@@ -42,49 +43,50 @@ header {
 
 .buscador:focus {
   border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.4);
 }
 
 /* === LAYOUT PRINCIPAL === */
 main {
   display: flex;
-  flex-direction: column; /* 🔹 Coloca productos y orden uno debajo del otro */
-  gap: 30px;
-  padding: 20px;
-  max-width: 1200px;
+  flex-direction: column;
+  gap: 20px; /* menos espacio */
+  padding: 15px;
+  max-width: 900px; /* más compacto */
   margin: 0 auto;
 }
 
 /* === SECCIÓN PRODUCTOS === */
 .productos {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
+  padding: 15px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .productos h2 {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: #333;
   text-align: center;
+  font-size: 18px;
 }
 
 /* Scroll de productos */
 .productos-scroll {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 400px;
+  gap: 10px;
+  max-height: 320px; /* más pequeño */
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 10px;
+  padding-right: 6px;
   scrollbar-width: thin;
   scrollbar-color: #007bff #f1f1f1;
 }
 
 /* Scroll personalizado */
 .productos-scroll::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 .productos-scroll::-webkit-scrollbar-thumb {
   background-color: #007bff;
@@ -97,13 +99,14 @@ main {
 /* Tarjetas de producto */
 .producto-card {
   border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
+  border-radius: 8px;
+  padding: 10px; /* más compacto */
   background-color: #fefefe;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   transition: transform 0.2s;
+  font-size: 14px;
 }
 
 .producto-card:hover {
@@ -114,9 +117,10 @@ main {
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 8px 10px;
+  border-radius: 5px;
+  padding: 6px 8px; /* botones más pequeños */
   cursor: pointer;
+  font-size: 13px;
 }
 
 .producto-card button:hover {
@@ -126,53 +130,57 @@ main {
 /* === SECCIÓN ORDEN === */
 .orden {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 12px;
+  padding: 15px;
+  border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .orden h2 {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: #333;
   text-align: center;
+  font-size: 18px;
 }
 
 .orden-lista {
-  max-height: 250px;
+  max-height: 200px; /* más pequeño */
   overflow-y: auto;
   border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
 }
 
 .orden-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  font-size: 14px;
 }
 
 .mesa-input {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .mesa-input label {
   font-weight: bold;
+  font-size: 14px;
 }
 
 .mesa-input select {
-  width: 120px;
-  padding: 5px;
+  width: 100px; /* más estrecho */
+  padding: 4px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 13px;
 }
 
 /* Botón enviar */
@@ -180,11 +188,12 @@ main {
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 10px 20px;
+  border-radius: 6px;
+  padding: 8px 16px; /* más pequeño */
   cursor: pointer;
-  margin-top: 15px;
+  margin-top: 10px;
   width: 100%;
+  font-size: 15px;
 }
 
 .btn-enviar:hover {
@@ -194,14 +203,14 @@ main {
 /* === NOTIFICACIÓN === */
 .notificacion {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 15px;
+  right: 15px;
   background: #3498db;
   color: white;
-  padding: 12px 20px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.2);
   opacity: 0;
   animation: fadeInOut 2.5s forwards;
@@ -209,22 +218,26 @@ main {
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
+  0% { opacity: 0; transform: translateY(15px); }
   10%, 90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 0; transform: translateY(15px); }
 }
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
+  main {
+    padding: 10px;
+  }
+
   .productos-scroll {
-    max-height: 300px;
+    max-height: 250px;
   }
 
   .orden-lista {
-    max-height: 200px;
+    max-height: 180px;
   }
 
   .btn-enviar {
-    font-size: 15px;
+    font-size: 14px;
   }
 }
