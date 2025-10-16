@@ -210,8 +210,9 @@ main {
 /* === NOTIFICACIÓN === */
 .notificacion {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  top: 20px; /* En lugar de bottom */
+  left: 50%;
+  transform: translateX(-50%); /* Centra horizontalmente */
   background: #3498db;
   color: white;
   padding: 14px 22px;
@@ -224,10 +225,11 @@ main {
   z-index: 9999;
 }
 
+/* Animación de entrada/salida */
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(20px); }
-  10%, 90% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(20px); }
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10%, 90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
 }
 
 /* === RESPONSIVE (TELÉFONO / TABLET) === */
