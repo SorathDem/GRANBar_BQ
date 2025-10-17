@@ -160,6 +160,8 @@
   const guardarCambios = document.getElementById("guardarCambios");
   const cancelarEdicion = document.getElementById("cancelarEdicion");
 
+  // 🔹 contenedor para productos en el modal
+  let contenedorProductos;
   let ordenActual = null;
 
   // 🔓 Cerrar sesión
@@ -268,17 +270,96 @@
     editMesa.value = orden.mesa || "";
     editTotal.value = orden.total || 0;
     editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+
+    // 🔹 Crear lista de productos en el modal
+    if (!contenedorProductos) {
+      contenedorProductos = document.createElement("div");
+      contenedorProductos.id = "contenedorProductos";
+      contenedorProductos.style.marginTop = "15px";
+      modalEditar.querySelector("div").appendChild(contenedorProductos);
+    }
+
+    contenedorProductos.innerHTML = "<h4>Productos:</h4>";
+
+    orden.items.forEach((item, index) => {
+      const itemDiv = document.createElement("div");
+      itemDiv.style.border = "1px solid #ccc";
+      itemDiv.style.padding = "8px";
+      itemDiv.style.borderRadius = "6px";
+      itemDiv.style.marginBottom = "6px";
+      itemDiv.style.background = "#f9f9f9";
+
+      itemDiv.innerHTML = `
+        <label>Nombre:</label>
+        <input type="text" class="input-nombre" value="${item.nombre}" style="width:100%; margin-bottom:5px;">
+        <label>Cantidad:</label>
+        <input type="number" class="input-cantidad" value="${item.cantidad}" style="width:100%; margin-bottom:5px;">
+        <label>Recomendaciones:</label>
+        <input type="text" class="input-recomendaciones" value="${item.recomendaciones || ""}" style="width:100%; margin-bottom:5px;">
+        <button class="btnEliminarProducto" style="background:red;color:white;width:100%;">Eliminar Producto</button>
+      `;
+
+      itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => {
+        itemDiv.remove();
+      });
+
+      contenedorProductos.appendChild(itemDiv);
+    });
+
+    // Botón agregar producto
+    const btnAgregarProducto = document.createElement("button");
+    btnAgregarProducto.textContent = "➕ Agregar producto";
+    btnAgregarProducto.style.marginTop = "10px";
+    btnAgregarProducto.addEventListener("click", () => agregarNuevoProducto());
+    contenedorProductos.appendChild(btnAgregarProducto);
+
     modalEditar.style.display = "flex";
+  }
+
+  // ➕ Agregar un nuevo producto en el modal
+  function agregarNuevoProducto() {
+    const itemDiv = document.createElement("div");
+    itemDiv.style.border = "1px solid #ccc";
+    itemDiv.style.padding = "8px";
+    itemDiv.style.borderRadius = "6px";
+    itemDiv.style.marginBottom = "6px";
+    itemDiv.style.background = "#f9f9f9";
+
+    itemDiv.innerHTML = `
+      <label>Nombre:</label>
+      <input type="text" class="input-nombre" style="width:100%; margin-bottom:5px;">
+      <label>Cantidad:</label>
+      <input type="number" class="input-cantidad" value="1" style="width:100%; margin-bottom:5px;">
+      <label>Recomendaciones:</label>
+      <input type="text" class="input-recomendaciones" style="width:100%; margin-bottom:5px;">
+      <button class="btnEliminarProducto" style="background:red;color:white;width:100%;">Eliminar Producto</button>
+    `;
+
+    itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => {
+      itemDiv.remove();
+    });
+
+    contenedorProductos.insertBefore(itemDiv, contenedorProductos.lastChild);
   }
 
   // 💾 Guardar cambios de edición
   guardarCambios.addEventListener("click", async () => {
     if (!ordenActual) return;
 
+    // obtener productos desde el modal
+    const productosEditados = Array.from(contenedorProductos.querySelectorAll("div"))
+      .filter(div => div.querySelector(".input-nombre"))
+      .map(div => ({
+        nombre: div.querySelector(".input-nombre").value,
+        cantidad: parseInt(div.querySelector(".input-cantidad").value),
+        recomendaciones: div.querySelector(".input-recomendaciones").value
+      }));
+
     const datosActualizados = {
       mesa: editMesa.value,
       total: parseFloat(editTotal.value),
       fecha: editFecha.value,
+      items: productosEditados
     };
 
     try {
@@ -353,5 +434,6 @@
     }
   });
 </script>
+
 </body>
 </html>
