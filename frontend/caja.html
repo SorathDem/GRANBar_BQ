@@ -58,6 +58,7 @@
       padding: 12px;
       border-bottom: 1px solid #eee;
       text-align: center;
+      vertical-align: middle;
     }
 
     th {
@@ -102,7 +103,9 @@
   <table id="tablaOrdenes">
     <thead>
       <tr>
+        <th>Mesa</th>
         <th>Productos</th>
+        <th>Recomendaciones</th>
         <th>Total</th>
         <th>Fecha</th>
       </tr>
@@ -116,7 +119,6 @@
     <button id="cerrarCaja">Cerrar Caja</button>
   </div>
 
-  <!-- 👇 Usa módulo para permitir imports en caja.js -->
   <script type="module">
     import { API_BASE } from "./config.js";
 
@@ -133,11 +135,10 @@
       window.location.href = "login.html";
     });
 
-    // 🧭 Capturar fecha desde URL (ej: ?fecha=2025-10-14)
+    // 🧭 Capturar fecha desde URL (?fecha=YYYY-MM-DD)
     window.addEventListener("DOMContentLoaded", () => {
       const params = new URLSearchParams(window.location.search);
       const fechaURL = params.get("fecha");
-
       if (fechaURL) {
         fechaInput.value = fechaURL;
         buscarOrdenesPorFecha(fechaURL);
@@ -175,18 +176,30 @@
       buscarOrdenesPorFecha(fechaInput.value);
     });
 
-    // 🧾 Renderizar órdenes
+    // 🧾 Renderizar órdenes con mesa y recomendaciones
     function renderOrdenes(ordenes) {
       tablaBody.innerHTML = "";
       let total = 0;
 
       ordenes.forEach((orden) => {
         const fila = document.createElement("tr");
-        const productos = orden.items.map((p) => `${p.nombre} (${p.cantidad})`).join(", ");
-        const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
+
+        // Productos
+        const productos = orden.items
+          .map((p) => `${p.nombre} (${p.cantidad})`)
+          .join(", ");
+
+        // Recomendaciones (campo opcional)
+        const recomendaciones = orden.recomendaciones || "—";
+
+        // Fecha local (Colombia)
+        const fechaLocal = new Date(orden.createdAt)
+          .toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
         fila.innerHTML = `
+          <td>${orden.mesa || "N/A"}</td>
           <td>${productos}</td>
+          <td>${recomendaciones}</td>
           <td>$${orden.total.toLocaleString()}</td>
           <td>${fechaLocal}</td>
         `;
