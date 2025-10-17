@@ -60,16 +60,8 @@ function renderOrdenes(ordenes) {
 
   ordenes.forEach((orden) => {
     const fila = document.createElement("tr");
-
-    const productos = orden.items.map((p) => {
-      let texto = `${p.nombre} (${p.cantidad})`;
-      if (p.recomendaciones && p.recomendaciones.trim() !== "") {
-        texto += ` — 📝 ${p.recomendaciones}`;
-      }
-      return texto;
-    }).join("<br>");
-
-    const fechaLocal = convertirFechaColombia(orden.createdAt);
+    const productos = orden.items.map((p) => `${p.nombre} (${p.cantidad})`).join(", ");
+    const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
     fila.innerHTML = `
       <td>${orden.mesa || "N/A"}</td>
@@ -77,8 +69,8 @@ function renderOrdenes(ordenes) {
       <td>$${orden.total.toLocaleString()}</td>
       <td>${fechaLocal}</td>
       <td>
-        <button onclick="editOrden('${orden._id}')">✏️</button>
-        <button onclick="deleteOrden('${orden._id}')">🗑️</button>
+        <button onclick='abrirModalEdicion(${JSON.stringify(orden)})'>✏️ Editar</button>
+        <button onclick='eliminarOrden("${orden._id}")' style='background:red;'>🗑️ Eliminar</button>
       </td>
     `;
 
@@ -117,86 +109,66 @@ cerrarCajaBtn.addEventListener("click", async () => {
   }
 });
 
-window.editOrden = async function(id) {
-  try {
-    const res = await fetch(`${API_BASE}/orden/${id}`);
-    if (!res.ok) throw new Error("No se pudo obtener la orden");
+let ordenEditando = null;
 
-    const orden = await res.json();
+// ✏️ Función para abrir el modal
+function abrirModalEdicion(orden) {
+  ordenEditando = orden;
+  editMesa.value = orden.mesa;
+  editTotal.value = orden.total;
+  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+  modalEditar.style.display = "flex";
+}
 
-    ordenIdInput.value = orden._id;
-    mesaInput.value = orden.mesa || "";
-    totalInput.value = orden.total || 0;
+// ❌ Cerrar modal
+cancelarEdicionBtn.addEventListener("click", () => {
+  modalEditar.style.display = "none";
+  ordenEditando = null;
+});
 
-    // Mostrar los productos y recomendaciones en texto
-    productosInput.value = orden.items.map(
-      (p) => `${p.nombre} (${p.cantidad}) - $${p.precio}`
-    ).join("\n");
+// 💾 Guardar cambios
+guardarCambiosBtn.addEventListener("click", async () => {
+  if (!ordenEditando) return;
 
-    recomendacionesInput.value = orden.items.map(
-      (p) => p.recomendaciones || ""
-    ).join("\n");
-
-    modalOrden.classList.remove("hidden");
-  } catch (error) {
-    console.error("💥 Error al editar orden:", error);
-    alert("No se pudo cargar la orden.");
-  }
-};
-
-// 💾 Guardar cambios de orden
-ordenForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const id = ordenIdInput.value;
-
-  const updatedOrden = {
-    mesa: mesaInput.value,
-    total: parseInt(totalInput.value),
-    recomendaciones: recomendacionesInput.value,
-    productos: productosInput.value,
+  const datosActualizados = {
+    mesa: editMesa.value,
+    total: Number(editTotal.value),
+    fecha: editFecha.value
   };
 
   try {
-    const res = await fetch(`${API_BASE}/orden/${id}`, {
+    const res = await fetch(`${API_BASE}/ordenes/${ordenEditando._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedOrden),
+      body: JSON.stringify(datosActualizados)
     });
 
-    if (!res.ok) throw new Error("No se pudo actualizar la orden");
+    if (!res.ok) throw new Error("Error al actualizar la orden");
 
-    alert("✅ Orden actualizada correctamente.");
-    modalOrden.classList.add("hidden");
+    alert("✅ Orden actualizada correctamente");
+    modalEditar.style.display = "none";
     buscarOrdenesPorFecha(fechaInput.value);
-  } catch (error) {
-    console.error("💥 Error guardando cambios:", error);
-    alert("❌ Error al guardar los cambios de la orden.");
+  } catch (err) {
+    console.error("💥 Error actualizando orden:", err);
+    alert("❌ No se pudo actualizar la orden.");
   }
-});
-
-// ❌ Cerrar modal
-closeModalOrden.addEventListener("click", () => {
-  modalOrden.classList.add("hidden");
 });
 
 // 🗑️ Eliminar orden
-window.deleteOrden = async function(id) {
+async function eliminarOrden(id) {
   if (!confirm("¿Seguro que deseas eliminar esta orden?")) return;
 
   try {
-    const res = await fetch(`${API_BASE}/orden/${id}`, {
-      method: "DELETE",
-    });
+    const res = await fetch(`${API_BASE}/ordenes/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Error al eliminar orden");
 
-    if (!res.ok) throw new Error("No se pudo eliminar la orden");
-
-    alert("🗑️ Orden eliminada correctamente.");
+    alert("🗑️ Orden eliminada correctamente");
     buscarOrdenesPorFecha(fechaInput.value);
-  } catch (error) {
-    console.error("💥 Error eliminando orden:", error);
+  } catch (err) {
+    console.error("💥 Error eliminando orden:", err);
     alert("❌ No se pudo eliminar la orden.");
   }
-};
+}
 
 // 📅 Reporte diario
 reporteDiarioBtn.addEventListener("click", async () => {
