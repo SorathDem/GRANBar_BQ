@@ -157,7 +157,7 @@ guardarCambiosBtn.addEventListener("click", async () => {
   };
 
   try {
-    const res = await fetch(`${API_BASE}/ordenes/${ordenEditando._id}`, {
+    const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datosActualizados)
