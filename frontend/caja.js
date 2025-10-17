@@ -60,26 +60,46 @@ function renderOrdenes(ordenes) {
 
   ordenes.forEach((orden) => {
     const fila = document.createElement("tr");
-    const productos = orden.items.map((p) => `${p.nombre} (${p.cantidad})`).join(", ");
+
+    const productos = orden.items
+      .map((p) => `${p.nombre} (${p.cantidad})${p.recomendaciones ? " — 📝 " + p.recomendaciones : ""}`)
+      .join("<br>");
+
     const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
+    // Crear botones (sin usar onclick en HTML)
+    const btnEditar = document.createElement("button");
+    btnEditar.textContent = "✏️ Editar";
+    btnEditar.style.marginRight = "6px";
+    btnEditar.addEventListener("click", () => abrirModalEdicion(orden));
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "🗑️ Eliminar";
+    btnEliminar.style.background = "red";
+    btnEliminar.style.color = "white";
+    btnEliminar.addEventListener("click", () => eliminarOrden(orden._id));
+
+    const celdaAcciones = document.createElement("td");
+    celdaAcciones.appendChild(btnEditar);
+    celdaAcciones.appendChild(btnEliminar);
+
+    // Rellenar la fila
     fila.innerHTML = `
       <td>${orden.mesa || "N/A"}</td>
       <td>${productos}</td>
       <td>$${orden.total.toLocaleString()}</td>
       <td>${fechaLocal}</td>
-      <td>
-        <button onclick='abrirModalEdicion(${JSON.stringify(orden)})'>✏️ Editar</button>
-        <button onclick='eliminarOrden("${orden._id}")' style='background:red;'>🗑️ Eliminar</button>
-      </td>
     `;
 
-    total += orden.total;
+    fila.appendChild(celdaAcciones);
     tablaBody.appendChild(fila);
+
+    total += orden.total;
   });
 
   totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
 }
+
 
 
 // 💰 Cerrar caja
