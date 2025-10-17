@@ -54,14 +54,21 @@ buscarBtn.addEventListener("click", () => {
   buscarOrdenesPorFecha(fechaInput.value);
 });
 
-// 🧾 Renderizar órdenes
 function renderOrdenes(ordenes) {
   tablaBody.innerHTML = "";
   let total = 0;
 
   ordenes.forEach((orden) => {
     const fila = document.createElement("tr");
-    const productos = orden.items.map((p) => `${p.nombre} (${p.cantidad})`).join(", ");
+
+    const productos = orden.items.map((p) => {
+      let texto = `${p.nombre} (${p.cantidad})`;
+      if (p.recomendaciones && p.recomendaciones.trim() !== "") {
+        texto += ` — 📝 ${p.recomendaciones}`;
+      }
+      return texto;
+    }).join("<br>");
+
     const fechaLocal = convertirFechaColombia(orden.createdAt);
 
     fila.innerHTML = `
@@ -69,6 +76,10 @@ function renderOrdenes(ordenes) {
       <td>${productos}</td>
       <td>$${orden.total.toLocaleString()}</td>
       <td>${fechaLocal}</td>
+      <td>
+        <button onclick="editOrden('${orden._id}')">✏️</button>
+        <button onclick="deleteOrden('${orden._id}')">🗑️</button>
+      </td>
     `;
 
     total += orden.total;
@@ -77,6 +88,7 @@ function renderOrdenes(ordenes) {
 
   totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
 }
+
 
 // 💰 Cerrar caja
 cerrarCajaBtn.addEventListener("click", async () => {
@@ -104,6 +116,87 @@ cerrarCajaBtn.addEventListener("click", async () => {
     alert("❌ Error al cerrar la caja.");
   }
 });
+
+window.editOrden = async function(id) {
+  try {
+    const res = await fetch(`${API_BASE}/orden/${id}`);
+    if (!res.ok) throw new Error("No se pudo obtener la orden");
+
+    const orden = await res.json();
+
+    ordenIdInput.value = orden._id;
+    mesaInput.value = orden.mesa || "";
+    totalInput.value = orden.total || 0;
+
+    // Mostrar los productos y recomendaciones en texto
+    productosInput.value = orden.items.map(
+      (p) => `${p.nombre} (${p.cantidad}) - $${p.precio}`
+    ).join("\n");
+
+    recomendacionesInput.value = orden.items.map(
+      (p) => p.recomendaciones || ""
+    ).join("\n");
+
+    modalOrden.classList.remove("hidden");
+  } catch (error) {
+    console.error("💥 Error al editar orden:", error);
+    alert("No se pudo cargar la orden.");
+  }
+};
+
+// 💾 Guardar cambios de orden
+ordenForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = ordenIdInput.value;
+
+  const updatedOrden = {
+    mesa: mesaInput.value,
+    total: parseInt(totalInput.value),
+    recomendaciones: recomendacionesInput.value,
+    productos: productosInput.value,
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/orden/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedOrden),
+    });
+
+    if (!res.ok) throw new Error("No se pudo actualizar la orden");
+
+    alert("✅ Orden actualizada correctamente.");
+    modalOrden.classList.add("hidden");
+    buscarOrdenesPorFecha(fechaInput.value);
+  } catch (error) {
+    console.error("💥 Error guardando cambios:", error);
+    alert("❌ Error al guardar los cambios de la orden.");
+  }
+});
+
+// ❌ Cerrar modal
+closeModalOrden.addEventListener("click", () => {
+  modalOrden.classList.add("hidden");
+});
+
+// 🗑️ Eliminar orden
+window.deleteOrden = async function(id) {
+  if (!confirm("¿Seguro que deseas eliminar esta orden?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/orden/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("No se pudo eliminar la orden");
+
+    alert("🗑️ Orden eliminada correctamente.");
+    buscarOrdenesPorFecha(fechaInput.value);
+  } catch (error) {
+    console.error("💥 Error eliminando orden:", error);
+    alert("❌ No se pudo eliminar la orden.");
+  }
+};
 
 // 📅 Reporte diario
 reporteDiarioBtn.addEventListener("click", async () => {
