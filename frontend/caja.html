@@ -143,120 +143,215 @@
   </div>
 
   <script type="module">
-    import { API_BASE } from "./config.js";
+  import { API_BASE } from "./config.js";
 
-    const fechaInput = document.getElementById("fecha");
-    const buscarBtn = document.getElementById("buscar");
-    const cerrarCajaBtn = document.getElementById("cerrarCaja");
-    const tablaBody = document.querySelector("#tablaOrdenes tbody");
-    const totalDiaDiv = document.getElementById("totalDia");
-    const logoutBtn = document.getElementById("logoutBtn");
+  const fechaInput = document.getElementById("fecha");
+  const buscarBtn = document.getElementById("buscar");
+  const cerrarCajaBtn = document.getElementById("cerrarCaja");
+  const tablaBody = document.querySelector("#tablaOrdenes tbody");
+  const totalDiaDiv = document.getElementById("totalDia");
+  const logoutBtn = document.getElementById("logoutBtn");
 
-    // 🔓 Cerrar sesión
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.href = "login.html";
-    });
+  // Modal elementos
+  const modalEditar = document.getElementById("modalEditar");
+  const editMesa = document.getElementById("editMesa");
+  const editTotal = document.getElementById("editTotal");
+  const editFecha = document.getElementById("editFecha");
+  const guardarCambios = document.getElementById("guardarCambios");
+  const cancelarEdicion = document.getElementById("cancelarEdicion");
 
-    // 🧭 Capturar fecha desde URL (?fecha=YYYY-MM-DD)
-    window.addEventListener("DOMContentLoaded", () => {
-      const params = new URLSearchParams(window.location.search);
-      const fechaURL = params.get("fecha");
-      if (fechaURL) {
-        fechaInput.value = fechaURL;
-        buscarOrdenesPorFecha(fechaURL);
-      }
-    });
+  let ordenActual = null;
 
-    // 🔍 Buscar órdenes por fecha
-    async function buscarOrdenesPorFecha(fechaSeleccionada) {
-      if (!fechaSeleccionada) {
-        alert("Por favor selecciona una fecha.");
+  // 🔓 Cerrar sesión
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  });
+
+  // 🧭 Capturar fecha desde URL (?fecha=YYYY-MM-DD)
+  window.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const fechaURL = params.get("fecha");
+    if (fechaURL) {
+      fechaInput.value = fechaURL;
+      buscarOrdenesPorFecha(fechaURL);
+    }
+  });
+
+  // 🔍 Buscar órdenes por fecha
+  async function buscarOrdenesPorFecha(fechaSeleccionada) {
+    if (!fechaSeleccionada) {
+      alert("Por favor selecciona una fecha.");
+      return;
+    }
+
+    try {
+      const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`).toISOString().split("T")[0];
+      const response = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
+      if (!response.ok) throw new Error(await response.text());
+
+      const ordenes = await response.json();
+
+      if (!Array.isArray(ordenes) || ordenes.length === 0) {
+        tablaBody.innerHTML = `<tr><td colspan="5">No se encontraron órdenes para esa fecha</td></tr>`;
+        totalDiaDiv.textContent = "";
         return;
       }
 
-      try {
-        const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`).toISOString().split("T")[0];
-        const response = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
-        if (!response.ok) throw new Error(await response.text());
-
-        const ordenes = await response.json();
-
-        if (!Array.isArray(ordenes) || ordenes.length === 0) {
-          tablaBody.innerHTML = `<tr><td colspan="5">No se encontraron órdenes para esa fecha</td></tr>`;
-          totalDiaDiv.textContent = "";
-          return;
-        }
-
-        renderOrdenes(ordenes);
-      } catch (error) {
-        console.error("Error al buscar órdenes:", error);
-        alert("❌ Error al buscar las órdenes del día.");
-      }
+      renderOrdenes(ordenes);
+    } catch (error) {
+      console.error("Error al buscar órdenes:", error);
+      alert("❌ Error al buscar las órdenes del día.");
     }
+  }
 
-    buscarBtn.addEventListener("click", () => {
-      buscarOrdenesPorFecha(fechaInput.value);
-    });
+  buscarBtn.addEventListener("click", () => {
+    buscarOrdenesPorFecha(fechaInput.value);
+  });
 
-    // 🧾 Renderizar órdenes con mesa y recomendaciones
-    function renderOrdenes(ordenes) {
-      tablaBody.innerHTML = "";
-      let total = 0;
+  // 🧾 Renderizar órdenes con botones de acción
+  function renderOrdenes(ordenes) {
+    tablaBody.innerHTML = "";
+    let total = 0;
 
-      ordenes.forEach((orden) => {
-        const fila = document.createElement("tr");
+    ordenes.forEach((orden) => {
+      const fila = document.createElement("tr");
 
-        // Mostrar productos con recomendaciones si existen
-        const productos = orden.items.map((p) => {
-          let texto = `${p.nombre} (${p.cantidad})`;
-          if (p.recomendaciones && p.recomendaciones.trim() !== "") {
-            texto += ` — 📝 ${p.recomendaciones}`;
-          }
-          return texto;
-        }).join("<br>");
+      const productos = orden.items
+        .map(
+          (p) =>
+            `${p.nombre} (${p.cantidad})${
+              p.recomendaciones ? " — 📝 " + p.recomendaciones : ""
+            }`
+        )
+        .join("<br>");
 
-        const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
-
-        fila.innerHTML = `
-          <td>${orden.mesa || "N/A"}</td>
-          <td>${productos}</td>
-          <td>$${orden.total.toLocaleString()}</td>
-          <td>${fechaLocal}</td>
-        `;
-
-        total += orden.total;
-        tablaBody.appendChild(fila);
+      const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", {
+        timeZone: "America/Bogota",
       });
 
-      totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
-    }
+      // Crear botones
+      const btnEditar = document.createElement("button");
+      btnEditar.textContent = "✏️ Editar";
+      btnEditar.style.marginRight = "5px";
+      btnEditar.addEventListener("click", () => abrirModalEdicion(orden));
 
+      const btnEliminar = document.createElement("button");
+      btnEliminar.textContent = "🗑️ Eliminar";
+      btnEliminar.style.background = "red";
+      btnEliminar.style.color = "white";
+      btnEliminar.addEventListener("click", () => eliminarOrden(orden._id));
 
-    // 💰 Cerrar caja
-    cerrarCajaBtn.addEventListener("click", async () => {
-      const fechaSeleccionada = fechaInput.value;
-      if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
+      const celdaAcciones = document.createElement("td");
+      celdaAcciones.appendChild(btnEditar);
+      celdaAcciones.appendChild(btnEliminar);
 
-      const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
-      if (!confirmacion) return;
+      // Crear fila
+      fila.innerHTML = `
+        <td>${orden.mesa || "N/A"}</td>
+        <td>${productos}</td>
+        <td>$${orden.total.toLocaleString()}</td>
+        <td>${fechaLocal}</td>
+      `;
+      fila.appendChild(celdaAcciones);
+      tablaBody.appendChild(fila);
 
-      try {
-        const response = await fetch(`${API_BASE}/cerrar-caja`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fecha: fechaSeleccionada }),
-        });
-
-        if (!response.ok) throw new Error(await response.text());
-
-        const data = await response.json();
-        alert(`✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
-      } catch (error) {
-        console.error("Error cerrando caja:", error);
-        alert("❌ Error al cerrar la caja.");
-      }
+      total += orden.total;
     });
-  </script>
+
+    totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
+  }
+
+  // ✏️ Abrir modal para editar
+  function abrirModalEdicion(orden) {
+    ordenActual = orden;
+    editMesa.value = orden.mesa || "";
+    editTotal.value = orden.total || 0;
+    editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+    modalEditar.style.display = "flex";
+  }
+
+  // 💾 Guardar cambios de edición
+  guardarCambios.addEventListener("click", async () => {
+    if (!ordenActual) return;
+
+    const datosActualizados = {
+      mesa: editMesa.value,
+      total: parseFloat(editTotal.value),
+      fecha: editFecha.value,
+    };
+
+    try {
+      const response = await fetch(`${API_BASE}/ordenes/${ordenActual._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datosActualizados),
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      alert("✅ Orden actualizada correctamente");
+      modalEditar.style.display = "none";
+      buscarOrdenesPorFecha(fechaInput.value);
+    } catch (error) {
+      console.error("Error actualizando orden:", error);
+      alert("❌ Error al actualizar la orden.");
+    }
+  });
+
+  cancelarEdicion.addEventListener("click", () => {
+    modalEditar.style.display = "none";
+  });
+
+  // 🗑️ Eliminar orden
+  async function eliminarOrden(id) {
+    const confirmar = confirm("¿Seguro que deseas eliminar esta orden?");
+    if (!confirmar) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/ordenes/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      alert("🗑️ Orden eliminada correctamente");
+      buscarOrdenesPorFecha(fechaInput.value);
+    } catch (error) {
+      console.error("Error eliminando orden:", error);
+      alert("❌ No se pudo eliminar la orden.");
+    }
+  }
+
+  // 💰 Cerrar caja
+  cerrarCajaBtn.addEventListener("click", async () => {
+    const fechaSeleccionada = fechaInput.value;
+    if (!fechaSeleccionada)
+      return alert("Selecciona una fecha antes de cerrar la caja.");
+
+    const confirmacion = confirm(
+      `¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`
+    );
+    if (!confirmacion) return;
+
+    try {
+      const response = await fetch(`${API_BASE}/cerrar-caja`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fecha: fechaSeleccionada }),
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      const data = await response.json();
+      alert(
+        `✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`
+      );
+    } catch (error) {
+      console.error("Error cerrando caja:", error);
+      alert("❌ Error al cerrar la caja.");
+    }
+  });
+</script>
 </body>
 </html>
