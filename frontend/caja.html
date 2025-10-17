@@ -387,7 +387,7 @@
     };
 
     try {
-      const response = await fetch(`${API_BASE}/ordenes/${ordenActual._id}`, {
+      const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(datosActualizados),
@@ -414,7 +414,7 @@
     if (!confirmar) return;
 
     try {
-      const response = await fetch(`${API_BASE}/ordenes/${id}`, {
+      const response = await fetch(`${API_BASE}/${id}`, {
         method: "DELETE",
       });
 
