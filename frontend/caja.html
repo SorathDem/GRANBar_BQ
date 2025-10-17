@@ -184,22 +184,20 @@
       ordenes.forEach((orden) => {
         const fila = document.createElement("tr");
 
-        // Productos
-        const productos = orden.items
-          .map((p) => `${p.nombre} (${p.cantidad})`)
-          .join(", ");
+        // Mostrar productos con recomendaciones si existen
+        const productos = orden.items.map((p) => {
+          let texto = `${p.nombre} (${p.cantidad})`;
+          if (p.recomendaciones && p.recomendaciones.trim() !== "") {
+            texto += ` — 📝 ${p.recomendaciones}`;
+          }
+          return texto;
+        }).join("<br>");
 
-        // Recomendaciones (campo opcional)
-        const recomendaciones = orden.recomendaciones || "—";
-
-        // Fecha local (Colombia)
-        const fechaLocal = new Date(orden.createdAt)
-          .toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
+        const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
         fila.innerHTML = `
           <td>${orden.mesa || "N/A"}</td>
           <td>${productos}</td>
-          <td>${recomendaciones}</td>
           <td>$${orden.total.toLocaleString()}</td>
           <td>${fechaLocal}</td>
         `;
@@ -210,6 +208,7 @@
 
       totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
     }
+
 
     // 💰 Cerrar caja
     cerrarCajaBtn.addEventListener("click", async () => {
