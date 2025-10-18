@@ -115,52 +115,52 @@
 
   <div class="total" id="totalDia"></div>
 
-  <!-- 🧾 Modal de edición con scroll -->
-  <div id="modalEditar" style="
-    display:none;
-    position:fixed; top:0; left:0; width:100%; height:100%;
-    background:rgba(0,0,0,0.6);
-    justify-content:center; align-items:center;
-    z-index:9999;">
-    
-    <div style="
-      background:#fff; 
-      padding:25px; 
-      border-radius:10px; 
-      width:450px; 
-      max-height:80vh; 
-      overflow-y:auto; 
-      position:relative; 
-      box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+<!-- 🧾 Modal de edición con scroll -->
+<div id="modalEditar" style="
+  display:none;
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6);
+  justify-content:center; align-items:center;
+  z-index:9999;">
+  
+  <div style="
+    background:#fff; 
+    padding:25px; 
+    border-radius:10px; 
+    width:450px; 
+    max-height:80vh; 
+    overflow-y:auto; 
+    position:relative; 
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);">
 
-      <h3 style="text-align:center; color:#0984e3;">Editar Orden</h3>
+    <h3 style="text-align:center; color:#0984e3;">Editar Orden</h3>
 
-      <label>Mesa:</label>
-      <input type="text" id="editMesa" class="input-edit" style="width:100%; margin-bottom:10px;">
+    <label>Mesa:</label>
+    <input type="text" id="editMesa" class="input-edit" style="width:100%; margin-bottom:10px;">
 
-      <label>Total:</label>
-      <input type="number" id="editTotal" class="input-edit" style="width:100%; margin-bottom:10px;">
+    <label>Total:</label>
+    <input type="number" id="editTotal" class="input-edit" style="width:100%; margin-bottom:10px;">
 
-      <label>Fecha:</label>
-      <input type="date" id="editFecha" class="input-edit" style="width:100%; margin-bottom:10px;">
+    <label>Fecha:</label>
+    <input type="date" id="editFecha" class="input-edit" style="width:100%; margin-bottom:10px;">
 
-      <h4 style="margin-top:15px;">🛒 Productos</h4>
-      <div id="productosEditarContainer" style="
-          max-height:200px; 
-          overflow-y:auto; 
-          border:1px solid #ddd; 
-          padding:10px; 
-          border-radius:6px;
-          margin-bottom:15px;">
-        <!-- Aquí se insertan dinámicamente los productos -->
-      </div>
+    <h4 style="margin-top:15px;">🛒 Productos</h4>
+    <div id="productosEditarContainer" style="
+        max-height:200px; 
+        overflow-y:auto; 
+        border:1px solid #ddd; 
+        padding:10px; 
+        border-radius:6px;
+        margin-bottom:15px;">
+      <!-- Aquí se insertan dinámicamente los productos -->
+    </div>
 
-      <div style="text-align:right; margin-top:10px;">
-        <button id="guardarCambios">Guardar</button>
-        <button id="cancelarEdicion" style="background:#ccc; margin-left:10px;">Cancelar</button>
-      </div>
+    <div style="text-align:right; margin-top:10px;">
+      <button id="guardarCambios">Guardar</button>
+      <button id="cancelarEdicion" style="background:#ccc; margin-left:10px;">Cancelar</button>
     </div>
   </div>
+</div>
 
   <div class="acciones">
     <button id="cerrarCaja">Cerrar Caja</button>
@@ -176,21 +176,25 @@
   const totalDiaDiv = document.getElementById("totalDia");
   const logoutBtn = document.getElementById("logoutBtn");
 
+  // Modal elementos
   const modalEditar = document.getElementById("modalEditar");
   const editMesa = document.getElementById("editMesa");
   const editTotal = document.getElementById("editTotal");
   const editFecha = document.getElementById("editFecha");
   const guardarCambios = document.getElementById("guardarCambios");
   const cancelarEdicion = document.getElementById("cancelarEdicion");
-  const contenedorProductos = document.getElementById("productosEditarContainer");
 
+  // 🔹 contenedor para productos en el modal
+  let contenedorProductos;
   let ordenActual = null;
 
+  // 🔓 Cerrar sesión
   logoutBtn.addEventListener("click", () => {
     localStorage.removeItem("token");
     window.location.href = "login.html";
   });
 
+  // 🧭 Capturar fecha desde URL (?fecha=YYYY-MM-DD)
   window.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const fechaURL = params.get("fecha");
@@ -200,35 +204,59 @@
     }
   });
 
+  // 🔍 Buscar órdenes por fecha
   async function buscarOrdenesPorFecha(fechaSeleccionada) {
-    if (!fechaSeleccionada) return alert("Selecciona una fecha.");
+    if (!fechaSeleccionada) {
+      alert("Por favor selecciona una fecha.");
+      return;
+    }
+
     try {
       const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`).toISOString().split("T")[0];
-      const res = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
-      if (!res.ok) throw new Error(await res.text());
-      const ordenes = await res.json();
+      const response = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
+      if (!response.ok) throw new Error(await response.text());
+
+      const ordenes = await response.json();
+
       if (!Array.isArray(ordenes) || ordenes.length === 0) {
-        tablaBody.innerHTML = `<tr><td colspan="5">No hay órdenes para esta fecha</td></tr>`;
+        tablaBody.innerHTML = `<tr><td colspan="5">No se encontraron órdenes para esa fecha</td></tr>`;
         totalDiaDiv.textContent = "";
         return;
       }
+
       renderOrdenes(ordenes);
-    } catch (err) {
-      console.error(err);
-      alert("Error al buscar órdenes");
+    } catch (error) {
+      console.error("Error al buscar órdenes:", error);
+      alert("❌ Error al buscar las órdenes del día.");
     }
   }
 
-  buscarBtn.addEventListener("click", () => buscarOrdenesPorFecha(fechaInput.value));
+  buscarBtn.addEventListener("click", () => {
+    buscarOrdenesPorFecha(fechaInput.value);
+  });
 
+  // 🧾 Renderizar órdenes con botones de acción
   function renderOrdenes(ordenes) {
     tablaBody.innerHTML = "";
     let total = 0;
+
     ordenes.forEach((orden) => {
       const fila = document.createElement("tr");
-      const productos = orden.items.map(p => `${p.nombre} (${p.cantidad})${p.recomendaciones ? " — 📝 " + p.recomendaciones : ""}`).join("<br>");
-      const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", { timeZone: "America/Bogota" });
 
+      const productos = orden.items
+        .map(
+          (p) =>
+            `${p.nombre} (${p.cantidad})${
+              p.recomendaciones ? " — 📝 " + p.recomendaciones : ""
+            }`
+        )
+        .join("<br>");
+
+      const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", {
+        timeZone: "America/Bogota",
+      });
+
+      // Crear botones
       const btnEditar = document.createElement("button");
       btnEditar.textContent = "✏️ Editar";
       btnEditar.style.marginRight = "5px";
@@ -244,6 +272,7 @@
       celdaAcciones.appendChild(btnEditar);
       celdaAcciones.appendChild(btnEliminar);
 
+      // Crear fila
       fila.innerHTML = `
         <td>${orden.mesa || "N/A"}</td>
         <td>${productos}</td>
@@ -252,19 +281,31 @@
       `;
       fila.appendChild(celdaAcciones);
       tablaBody.appendChild(fila);
+
       total += orden.total;
     });
+
     totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
   }
 
+  // ✏️ Abrir modal para editar
   function abrirModalEdicion(orden) {
     ordenActual = orden;
     editMesa.value = orden.mesa || "";
     editTotal.value = orden.total || 0;
     editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
-    contenedorProductos.innerHTML = "";
 
-    orden.items.forEach((item) => {
+    // 🔹 Crear lista de productos en el modal
+    if (!contenedorProductos) {
+      contenedorProductos = document.createElement("div");
+      contenedorProductos.id = "contenedorProductos";
+      contenedorProductos.style.marginTop = "15px";
+      modalEditar.querySelector("div").appendChild(contenedorProductos);
+    }
+
+    contenedorProductos.innerHTML = "<h4>Productos:</h4>";
+
+    orden.items.forEach((item, index) => {
       const itemDiv = document.createElement("div");
       itemDiv.style.border = "1px solid #ccc";
       itemDiv.style.padding = "8px";
@@ -281,19 +322,25 @@
         <input type="text" class="input-recomendaciones" value="${item.recomendaciones || ""}" style="width:100%; margin-bottom:5px;">
         <button class="btnEliminarProducto" style="background:red;color:white;width:100%;">Eliminar Producto</button>
       `;
-      itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => itemDiv.remove());
+
+      itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => {
+        itemDiv.remove();
+      });
+
       contenedorProductos.appendChild(itemDiv);
     });
 
+    // Botón agregar producto
     const btnAgregarProducto = document.createElement("button");
     btnAgregarProducto.textContent = "➕ Agregar producto";
     btnAgregarProducto.style.marginTop = "10px";
-    btnAgregarProducto.addEventListener("click", agregarNuevoProducto);
+    btnAgregarProducto.addEventListener("click", () => agregarNuevoProducto());
     contenedorProductos.appendChild(btnAgregarProducto);
 
     modalEditar.style.display = "flex";
   }
 
+  // ➕ Agregar un nuevo producto en el modal
   function agregarNuevoProducto() {
     const itemDiv = document.createElement("div");
     itemDiv.style.border = "1px solid #ccc";
@@ -301,6 +348,7 @@
     itemDiv.style.borderRadius = "6px";
     itemDiv.style.marginBottom = "6px";
     itemDiv.style.background = "#f9f9f9";
+
     itemDiv.innerHTML = `
       <label>Nombre:</label>
       <input type="text" class="input-nombre" style="width:100%; margin-bottom:5px;">
@@ -310,12 +358,19 @@
       <input type="text" class="input-recomendaciones" style="width:100%; margin-bottom:5px;">
       <button class="btnEliminarProducto" style="background:red;color:white;width:100%;">Eliminar Producto</button>
     `;
-    itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => itemDiv.remove());
+
+    itemDiv.querySelector(".btnEliminarProducto").addEventListener("click", () => {
+      itemDiv.remove();
+    });
+
     contenedorProductos.insertBefore(itemDiv, contenedorProductos.lastChild);
   }
 
+  // 💾 Guardar cambios de edición
   guardarCambios.addEventListener("click", async () => {
     if (!ordenActual) return;
+
+    // obtener productos desde el modal
     const productosEditados = Array.from(contenedorProductos.querySelectorAll("div"))
       .filter(div => div.querySelector(".input-nombre"))
       .map(div => ({
@@ -332,18 +387,20 @@
     };
 
     try {
-      const res = await fetch(`${API_BASE}/ordenes/${ordenActual._id}`, {
+      const res = await fetch(`${API_BASE}/${ordenActual._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datosActualizados)
+        body: JSON.stringify(datosActualizados),
       });
 
+
       if (!res.ok) throw new Error(await res.text());
+
       alert("✅ Orden actualizada correctamente");
       modalEditar.style.display = "none";
       buscarOrdenesPorFecha(fechaInput.value);
-    } catch (err) {
-      console.error("Error actualizando orden:", err);
+    } catch (error) {
+      console.error("Error actualizando orden:", error);
       alert("❌ Error al actualizar la orden.");
     }
   });
@@ -352,37 +409,56 @@
     modalEditar.style.display = "none";
   });
 
+  // 🗑️ Eliminar orden
   async function eliminarOrden(id) {
-    if (!confirm("¿Seguro que deseas eliminar esta orden?")) return;
+    const confirmar = confirm("¿Seguro que deseas eliminar esta orden?");
+    if (!confirmar) return;
+
     try {
-      const res = await fetch(`${API_BASE}/ordenes/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error(await res.text());
+      const response = await fetch(`${API_BASE}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
       alert("🗑️ Orden eliminada correctamente");
       buscarOrdenesPorFecha(fechaInput.value);
-    } catch (err) {
-      console.error("Error eliminando orden:", err);
+    } catch (error) {
+      console.error("Error eliminando orden:", error);
       alert("❌ No se pudo eliminar la orden.");
     }
   }
 
+  // 💰 Cerrar caja
   cerrarCajaBtn.addEventListener("click", async () => {
     const fechaSeleccionada = fechaInput.value;
-    if (!fechaSeleccionada) return alert("Selecciona una fecha.");
-    if (!confirm(`¿Cerrar la caja del día ${fechaSeleccionada}?`)) return;
+    if (!fechaSeleccionada)
+      return alert("Selecciona una fecha antes de cerrar la caja.");
+
+    const confirmacion = confirm(
+      `¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`
+    );
+    if (!confirmacion) return;
+
     try {
-      const res = await fetch(`${API_BASE}/cerrar-caja`, {
+      const response = await fetch(`${API_BASE}/cerrar-caja`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fecha: fechaSeleccionada })
+        body: JSON.stringify({ fecha: fechaSeleccionada }),
       });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      alert(`✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
-    } catch (err) {
-      console.error("Error cerrando caja:", err);
+
+      if (!response.ok) throw new Error(await response.text());
+
+      const data = await response.json();
+      alert(
+        `✅ Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`
+      );
+    } catch (error) {
+      console.error("Error cerrando caja:", error);
       alert("❌ Error al cerrar la caja.");
     }
   });
-  </script>
+</script>
+
 </body>
 </html>
