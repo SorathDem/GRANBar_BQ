@@ -169,6 +169,8 @@
     <button id="cerrarCaja">Cerrar Caja</button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
   <script type="module">
   import { API_BASE } from "./config.js";
 
@@ -178,6 +180,8 @@
   const tablaBody = document.querySelector("#tablaOrdenes tbody");
   const totalDiaDiv = document.getElementById("totalDia");
   const logoutBtn = document.getElementById("logoutBtn");
+  const reporteDiarioBtn = document.getElementById("reporteDiario");
+  const reporteMensualBtn = document.getElementById("reporteMensual");
 
   // Modal elementos
   const modalEditar = document.getElementById("modalEditar");
@@ -462,117 +466,72 @@
     }
   });
 
-  // 📄 Generar PDF con jsPDF
-async function generarPDF(titulo, ordenes, periodoTexto) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+ cerrarCajaBtn.addEventListener("click", () => {
+    alert("✅ Caja cerrada correctamente.");
+  });
 
-  doc.setFontSize(16);
-  doc.text(titulo, 14, 20);
-  doc.setFontSize(10);
-  doc.text(`Periodo: ${periodoTexto}`, 14, 28);
+  logoutBtn.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  });
 
-  let y = 40; // posición vertical
+  // === NUEVA SECCIÓN DE REPORTES ===
 
-  if (!ordenes || ordenes.length === 0) {
-    doc.text("No se encontraron órdenes para este período.", 14, y);
-  } else {
-    ordenes.forEach((orden, index) => {
-      doc.setFont("helvetica", "bold");
-      doc.text(`Mesa: ${orden.mesa || "N/A"} — Total: $${orden.total.toLocaleString()}`, 14, y);
+  async function generarPDF(titulo, ordenes, periodoTexto) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text(titulo, 10, 15);
+    doc.setFontSize(12);
+    doc.text(periodoTexto, 10, 25);
+
+    let y = 40;
+    let total = 0;
+
+    ordenes.forEach((orden, i) => {
+      const productos = orden.productos.map(p => `${p.nombre} (${p.cantidad})`).join(", ");
+      doc.text(`${i + 1}. Mesa: ${orden.mesa} | Total: $${orden.total}`, 10, y);
       y += 6;
-
-      doc.setFont("helvetica", "normal");
-      orden.items.forEach((item) => {
-        const linea = `• ${item.nombre} (x${item.cantidad}) ${
-          item.recomendaciones ? "📝 " + item.recomendaciones : ""
-        }`;
-        doc.text(linea, 20, y);
-        y += 5;
-      });
-
-      y += 5; // espacio entre órdenes
+      doc.text(`   Productos: ${productos}`, 10, y);
+      y += 10;
+      total += orden.total;
 
       if (y > 270) {
         doc.addPage();
         y = 20;
       }
     });
+
+    doc.text(`💰 Total general: $${total.toLocaleString()}`, 10, y + 10);
+    doc.save(`${titulo.replace(/\s+/g, "_")}.pdf`);
   }
 
-  const total = ordenes.reduce((sum, o) => sum + (o.total || 0), 0);
-  y += 10;
-  doc.setFont("helvetica", "bold");
-  doc.text(`Total general: $${total.toLocaleString()}`, 14, y);
+  reporteDiarioBtn.addEventListener("click", async () => {
+    const fecha = fechaInput.value || new Date().toISOString().split("T")[0];
+    try {
+      const res = await fetch(`${API_BASE}/ordenes?fecha=${fecha}`);
+      const ordenes = await res.json();
+      await generarPDF("Reporte Diario", ordenes, `Fecha: ${fecha}`);
+    } catch (error) {
+      console.error("Error generando reporte diario:", error);
+    }
+  });
 
-  // Descargar PDF
-  doc.save(`${titulo.replace(/\s+/g, "_")}.pdf`);
-}
+  reporteMensualBtn.addEventListener("click", async () => {
+    const hoy = new Date();
+    const mes = hoy.getMonth() + 1;
+    const anio = hoy.getFullYear();
 
-reporteDiarioBtn.addEventListener("click", async () => {
-  const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) {
-    alert("Selecciona una fecha para generar el reporte diario.");
-    return;
-  }
-
-  try {
-    const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`)
-      .toISOString()
-      .split("T")[0];
-
-    const res = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
-    if (!res.ok) throw new Error(await res.text());
-
-    const ordenes = await res.json();
-
-    generarPDF(
-      "Reporte Diario de Órdenes",
-      ordenes,
-      `Día ${fechaSeleccionada}`
-    );
-  } catch (error) {
-    console.error("Error generando reporte diario:", error);
-    alert("❌ No se pudo generar el reporte diario.");
-  }
-});
-
-
-reporteMensualBtn.addEventListener("click", async () => {
-  const mes = prompt("Ingrese el mes (1-12):");
-  const año = prompt("Ingrese el año (ejemplo: 2025):");
-
-  if (!mes || !año) {
-    alert("Debes ingresar mes y año.");
-    return;
-  }
-
-  try {
-    // Obtener todas las órdenes
-    const res = await fetch(`${API_BASE}`);
-    if (!res.ok) throw new Error(await res.text());
-    const todas = await res.json();
-
-    // Filtrar por mes y año
-    const ordenesFiltradas = todas.filter((orden) => {
-      const fecha = new Date(orden.createdAt);
-      return (
-        fecha.getMonth() + 1 === parseInt(mes) &&
-        fecha.getFullYear() === parseInt(año)
-      );
-    });
-
-    generarPDF(
-      "Reporte Mensual de Órdenes",
-      ordenesFiltradas,
-      `Mes ${mes}/${año}`
-    );
-  } catch (error) {
-    console.error("Error generando reporte mensual:", error);
-    alert("❌ No se pudo generar el reporte mensual.");
-  }
-});
+    try {
+      const res = await fetch(`${API_BASE}/ordenes?mes=${mes}&anio=${anio}`);
+      const ordenes = await res.json();
+      await generarPDF("Reporte Mensual", ordenes, `Mes: ${mes}/${anio}`);
+    } catch (error) {
+      console.error("Error generando reporte mensual:", error);
+    }
+  });
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </body>
 </html>
