@@ -131,6 +131,23 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ordenEliminada = await Order.findByIdAndDelete(id);
+
+    if (!ordenEliminada) {
+      return res.status(404).json({ error: "Orden no encontrada" });
+    }
+
+    res.json({ message: "Orden eliminada correctamente", orden: ordenEliminada });
+  } catch (error) {
+    console.error("❌ Error eliminando orden:", error);
+    res.status(500).json({ error: "Error al eliminar la orden" });
+  }
+});
+
 // 📧 Reporte diario (dummy temporal)
 router.post("/reporte/diario", (req, res) => {
   console.log("📅 Reporte diario generado:", req.body);
