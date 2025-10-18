@@ -163,8 +163,17 @@ logoutBtn.addEventListener("click", () => {
   window.location.href = "login.html";
 });
 
-// 🔹 7. Generar mesas dinámicamente
 const mesaSelect = document.getElementById("mesa");
+
+// Opción inicial vacía
+const opcionDefault = document.createElement("option");
+opcionDefault.value = "";
+opcionDefault.textContent = "Selecciona una mesa...";
+opcionDefault.disabled = true;
+opcionDefault.selected = true;
+mesaSelect.appendChild(opcionDefault);
+
+// Generar mesas del 1 al 20
 for (let i = 1; i <= 20; i++) {
   const option = document.createElement("option");
   option.value = i;
