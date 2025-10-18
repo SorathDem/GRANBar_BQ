@@ -190,80 +190,6 @@ async function eliminarOrden(id) {
   }
 }
 
-// 📅 Reporte diario
-reporteDiarioBtn.addEventListener("click", async () => {
-  const fechaInputValor = fechaInput.value;
-  if (!fechaInputValor) return alert("Selecciona una fecha para generar el reporte diario.");
-
-  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "santiagoacostaavila2905@gmail.com");
-  if (!correoDestino) return;
-
-  try {
-    const ordenesResp = await fetch(`${API_BASE}/por-fecha/${fechaInputValor}`);
-    const ordenes = await ordenesResp.json();
-
-    if (!Array.isArray(ordenes) || ordenes.length === 0) {
-      alert("❌ No hay órdenes para esa fecha.");
-      return;
-    }
-
-    const response = await fetch(`${API_REPORTES}/reporte-diario`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ordenes, correo: correoDestino }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("⚠️ Error en reporte diario:", errorText);
-      alert("❌ Error al generar el reporte diario.");
-      return;
-    }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    window.open(url, "_blank");
-
-    alert(`📧 Reporte diario generado y enviado a ${correoDestino}`);
-  } catch (error) {
-    console.error("💥 Error reporte diario:", error);
-    alert("❌ Error al enviar el reporte diario.");
-  }
-});
-
-// 📆 Reporte mensual
-reporteMensualBtn.addEventListener("click", async () => {
-  const mes = prompt("Introduce el mes (YYYY-MM):");
-  if (!mes) return;
-
-  const correoDestino = prompt("Introduce el correo donde enviar el reporte:", "dueno@restaurante.com");
-  if (!correoDestino) return;
-
-  try {
-    const response = await fetch(API_REPORTES, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        fecha: mes,
-        correo: correoDestino,
-        tipo: "mensual",
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      alert(`📧 Reporte mensual enviado correctamente a ${correoDestino}`);
-    } else {
-      console.error("⚠️ Error en reporte mensual:", data);
-      alert(data.error || "❌ Error al generar o enviar el reporte mensual.");
-    }
-  } catch (error) {
-    console.error("💥 Error reporte mensual:", error);
-    alert("❌ Error al enviar el reporte mensual.");
-  }
-});
-
 // 🔄 Auto-cargar fecha desde cierre_caja.html (si viene con ?fecha=YYYY-MM-DD)
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
@@ -275,3 +201,115 @@ window.addEventListener("DOMContentLoaded", () => {
     buscarOrdenesPorFecha(fechaURL);
   }
 });
+
+// 📄 Generar PDF con jsPDF
+async function generarPDF(titulo, ordenes, periodoTexto) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text(titulo, 14, 20);
+  doc.setFontSize(10);
+  doc.text(`Periodo: ${periodoTexto}`, 14, 28);
+
+  let y = 40; // posición vertical
+
+  if (!ordenes || ordenes.length === 0) {
+    doc.text("No se encontraron órdenes para este período.", 14, y);
+  } else {
+    ordenes.forEach((orden, index) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(`Mesa: ${orden.mesa || "N/A"} — Total: $${orden.total.toLocaleString()}`, 14, y);
+      y += 6;
+
+      doc.setFont("helvetica", "normal");
+      orden.items.forEach((item) => {
+        const linea = `• ${item.nombre} (x${item.cantidad}) ${
+          item.recomendaciones ? "📝 " + item.recomendaciones : ""
+        }`;
+        doc.text(linea, 20, y);
+        y += 5;
+      });
+
+      y += 5; // espacio entre órdenes
+
+      if (y > 270) {
+        doc.addPage();
+        y = 20;
+      }
+    });
+  }
+
+  const total = ordenes.reduce((sum, o) => sum + (o.total || 0), 0);
+  y += 10;
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total general: $${total.toLocaleString()}`, 14, y);
+
+  // Descargar PDF
+  doc.save(`${titulo.replace(/\s+/g, "_")}.pdf`);
+}
+
+reporteDiarioBtn.addEventListener("click", async () => {
+  const fechaSeleccionada = fechaInput.value;
+  if (!fechaSeleccionada) {
+    alert("Selecciona una fecha para generar el reporte diario.");
+    return;
+  }
+
+  try {
+    const fechaISO = new Date(`${fechaSeleccionada}T00:00:00-05:00`)
+      .toISOString()
+      .split("T")[0];
+
+    const res = await fetch(`${API_BASE}/por-fecha/${fechaISO}`);
+    if (!res.ok) throw new Error(await res.text());
+
+    const ordenes = await res.json();
+
+    generarPDF(
+      "Reporte Diario de Órdenes",
+      ordenes,
+      `Día ${fechaSeleccionada}`
+    );
+  } catch (error) {
+    console.error("Error generando reporte diario:", error);
+    alert("❌ No se pudo generar el reporte diario.");
+  }
+});
+
+
+reporteMensualBtn.addEventListener("click", async () => {
+  const mes = prompt("Ingrese el mes (1-12):");
+  const año = prompt("Ingrese el año (ejemplo: 2025):");
+
+  if (!mes || !año) {
+    alert("Debes ingresar mes y año.");
+    return;
+  }
+
+  try {
+    // Obtener todas las órdenes
+    const res = await fetch(`${API_BASE}`);
+    if (!res.ok) throw new Error(await res.text());
+    const todas = await res.json();
+
+    // Filtrar por mes y año
+    const ordenesFiltradas = todas.filter((orden) => {
+      const fecha = new Date(orden.createdAt);
+      return (
+        fecha.getMonth() + 1 === parseInt(mes) &&
+        fecha.getFullYear() === parseInt(año)
+      );
+    });
+
+    generarPDF(
+      "Reporte Mensual de Órdenes",
+      ordenesFiltradas,
+      `Mes ${mes}/${año}`
+    );
+  } catch (error) {
+    console.error("Error generando reporte mensual:", error);
+    alert("❌ No se pudo generar el reporte mensual.");
+  }
+});
+
