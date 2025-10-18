@@ -112,6 +112,25 @@ router.post("/cerrar-caja", async (req, res) => {
   }
 });
 
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const datosActualizados = req.body;
+
+    // Busca y actualiza la orden
+    const ordenActualizada = await Order.findByIdAndUpdate(id, datosActualizados, { new: true });
+
+    if (!ordenActualizada) {
+      return res.status(404).json({ error: "Orden no encontrada" });
+    }
+
+    res.json({ message: "Orden actualizada correctamente", orden: ordenActualizada });
+  } catch (error) {
+    console.error("❌ Error actualizando orden:", error);
+    res.status(500).json({ error: "Error al actualizar la orden" });
+  }
+});
+
 // 📧 Reporte diario (dummy temporal)
 router.post("/reporte/diario", (req, res) => {
   console.log("📅 Reporte diario generado:", req.body);
