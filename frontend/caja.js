@@ -123,7 +123,8 @@ async function imprimirOrden(orden) {
 
   const payload = {
     mesa: orden.mesa,
-    productos: productosCaja
+    productos: productosCaja,
+    origen: "caja"
   };
 
   try {

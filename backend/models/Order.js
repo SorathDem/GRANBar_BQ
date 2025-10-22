@@ -30,7 +30,8 @@ const OrderSchema = new mongoose.Schema({
     },
   },
   createdAt: { type: Date, default: Date.now },
-  printedAt: { type: Date }
+  printedAt: { type: Date },
+  origen: { type: String, enum: ["mesero", "caja"], default: "mesero" }
 });
 
 export default mongoose.models.Order ||

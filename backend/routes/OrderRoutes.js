@@ -29,7 +29,8 @@ router.post("/", async (req, res) => {
       mesa,
       items,
       total,
-      status: "pending_print"
+      status: "pending_print",
+      origen: req.body.origen || "mesero"
     });
 
     await order.save();

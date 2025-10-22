@@ -104,13 +104,11 @@ enviarOrdenBtn.addEventListener("click", async () => {
     mostrarNotificacion("⚠️ No hay productos en la orden", "#f39c12");
     return;
   }
-
   const mesa = document.getElementById("mesa").value;
   if (!mesa) {
     mostrarNotificacion("⚠️ Debes seleccionar una mesa", "#f39c12");
     return;
   }
-
   const payload = {
     mesa,
     productos: orden.map((it) => ({
@@ -122,14 +120,12 @@ enviarOrdenBtn.addEventListener("click", async () => {
       recomendaciones: it.nota || "",
     })),
   };
-
   try {
     const resp = await fetch(API_BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
     if (resp.ok) {
       mostrarNotificacion("✅ Orden enviada para impresión", "#27ae60");
       orden = [];
