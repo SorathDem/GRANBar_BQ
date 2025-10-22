@@ -30,7 +30,6 @@ router.post("/", async (req, res) => {
       items,
       total,
       status: "pending_print",
-      origen: req.body.origen || "mesero"
     });
 
     await order.save();
