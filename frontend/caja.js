@@ -79,9 +79,17 @@ function renderOrdenes(ordenes) {
     btnEliminar.style.color = "white";
     btnEliminar.addEventListener("click", () => eliminarOrden(orden._id));
 
+    const btnImprimir = document.createElement("button");
+    btnImprimir.textContent = "🖨️ Imprimir";
+    btnImprimir.style.background = "green";
+    btnImprimir.style.color = "white";
+    btnImprimir.style.marginLeft = "5px";
+    btnImprimir.addEventListener("click", () => imprimirOrden(orden));
+
     const celdaAcciones = document.createElement("td");
     celdaAcciones.appendChild(btnEditar);
     celdaAcciones.appendChild(btnEliminar);
+    celdaAcciones.appendChild(btnImprimir);
 
     // Rellenar la fila
     fila.innerHTML = `
@@ -98,6 +106,42 @@ function renderOrdenes(ordenes) {
   });
 
   totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
+}
+
+async function imprimirOrden(orden) {
+  if (!orden || !orden.items || orden.items.length === 0) {
+    alert("❌ No hay productos para imprimir.");
+    return;
+  }
+
+  const productosCaja = orden.items.filter(item => item.category === "caja");
+
+  if (productosCaja.length === 0) {
+    alert("❌ No hay productos de caja para imprimir.");
+    return;
+  }
+
+  const payload = {
+    mesa: orden.mesa,
+    productos: productosCaja
+  };
+
+  try {
+    const resp = await fetch(`${API_BASE}/imprimir-caja`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (resp.ok) {
+      alert("✅ Orden enviada a imprimir en caja");
+    } else {
+      alert("❌ Error al enviar la orden a imprimir");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error de conexión al imprimir");
+  }
 }
 
 
