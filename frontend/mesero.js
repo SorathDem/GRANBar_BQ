@@ -104,53 +104,41 @@ enviarOrdenBtn.addEventListener("click", async () => {
     mostrarNotificacion("⚠️ No hay productos en la orden", "#f39c12");
     return;
   }
-
   const mesa = document.getElementById("mesa").value;
   if (!mesa) {
     mostrarNotificacion("⚠️ Debes seleccionar una mesa", "#f39c12");
     return;
   }
-
-  // ✅ Estructura clara del payload
   const payload = {
-    mesa: mesa,
-    status: "pending_print", // 👈 Para que el worker las detecte
-    createdAt: new Date().toISOString(),
+    mesa,
     productos: orden.map((it) => ({
-      _id: it._id || null, // evitar error si no tiene id
-      tipo: it.category || "general",
-      nombre: it.name || "Sin nombre",
-      cantidad: Number(it.cantidad) || 1,
-      precio: Number(it.price) || 0,
+      _id: it._id,
+      tipo: it.category || "",
+      nombre: it.name,
+      cantidad: it.cantidad,
+      precio: it.price,
       recomendaciones: it.nota || "",
     })),
   };
-
-  console.log("🧾 Orden enviada al servidor:", payload);
-
   try {
     const resp = await fetch(API_BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-
     if (resp.ok) {
-      mostrarNotificacion("✅ Orden enviada y almacenada correctamente", "#27ae60");
+      mostrarNotificacion("✅ Orden enviada para impresión", "#27ae60");
       orden = [];
       renderOrden();
       setTimeout(() => location.reload(), 1500);
     } else {
-      const errData = await resp.text();
-      console.error("❌ Error en la respuesta del servidor:", errData);
-      mostrarNotificacion("❌ Error al guardar la orden", "#e74c3c");
+      mostrarNotificacion("❌ Error al enviar la orden", "#e74c3c");
     }
   } catch (err) {
-    console.error("❌ Error de conexión o envío:", err);
-    mostrarNotificacion("❌ Error de conexión con el servidor", "#e74c3c");
+    console.error(err);
+    mostrarNotificacion("❌ Error de conexión", "#e74c3c");
   }
 });
-
 
 // 🔹 5. Filtro en tiempo real
 const buscador = document.getElementById("buscador");
