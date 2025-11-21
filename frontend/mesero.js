@@ -124,7 +124,7 @@ enviarOrdenBtn.addEventListener("click", async () => {
   };
 
   try {
-    const resp = await fetch(API_BASE + "/orders", {
+    const resp = await fetch(`${API_BASE}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
