@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
       mesa,
       items,
       total,
-      status: "pending_printer",  // ← CAMBIADO AQUÍ (antes era "pending_print")
+      status: "pending_print",  // ← CAMBIADO AQUÍ (antes era "pending_print")
       createdAt: new Date()       // opcional: fuerza la fecha
     });
 
