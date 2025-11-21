@@ -168,6 +168,28 @@ async function eliminarOrden(id) {
   }
 }
 
+async function imprimirFactura(orderId) {
+  if (!confirm("¿Imprimir factura para esta orden?")) return;
+
+  try {
+    const response = await fetch(`${API_BASE}/${orderId}/imprimir-factura`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) throw new Error(await response.text());
+
+    const data = await response.json();
+    alert("Factura enviada a impresión");
+
+    // Opcional: recargar la tabla para ver el nuevo estado
+    buscarOrdenesPorFecha(fechaInput.value);
+  } catch (error) {
+    console.error("Error enviando factura a impresión:", error);
+    alert("Error al enviar la factura. Intenta de nuevo.");
+  }
+}
+
 // 🔄 Auto-cargar fecha desde cierre_caja.html (si viene con ?fecha=YYYY-MM-DD)
 window.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);

@@ -73,6 +73,26 @@ router.post("/", async (req, res) => {
   }
 });
 
+// IMPRIMIR FACTURA (cambiar estado a pending_ticket)
+router.patch("/:id/imprimir-factura", async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { 
+        status: "pending_ticket",
+        printedTicketAt: new Date()
+      },
+      { new: true }
+    );
+
+    if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+
+    res.json({ message: "Factura enviada a impresión", order });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // ✅ Obtener órdenes por fecha
 router.get("/por-fecha/:fecha", async (req, res) => {
   try {
