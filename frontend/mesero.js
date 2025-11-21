@@ -101,17 +101,19 @@ function renderOrden() {
 // 🔹 4. Enviar la orden
 enviarOrdenBtn.addEventListener("click", async () => {
   if (orden.length === 0) {
-    mostrarNotificacion("⚠️ No hay productos en la orden", "#f39c12");
+    mostrarNotificacion("No hay productos en la orden", "#f39c12");
     return;
   }
-  const mesa = document.getElementById("mesa").value;
+
+  const mesa = document.getElementById("mesa").value.trim();
   if (!mesa) {
-    mostrarNotificacion("⚠️ Debes seleccionar una mesa", "#f39c12");
+    mostrarNotificacion("Debes seleccionar una mesa", "#f39c12");
     return;
   }
+
   const payload = {
     mesa,
-    productos: orden.map((it) => ({
+    items: orden.map((it) => ({
       _id: it._id,
       tipo: it.category || "",
       nombre: it.name,
@@ -120,23 +122,26 @@ enviarOrdenBtn.addEventListener("click", async () => {
       recomendaciones: it.nota || "",
     })),
   };
+
   try {
-    const resp = await fetch(API_BASE, {
+    const resp = await fetch(API_BASE + "/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
     if (resp.ok) {
-      mostrarNotificacion("✅ Orden enviada para impresión", "#27ae60");
+      mostrarNotificacion("Orden enviada a impresión", "#27ae60");
       orden = [];
       renderOrden();
-      setTimeout(() => location.reload(), 1500);
+      document.getElementById("mesa").value = "";
+      setTimeout(() => location.reload(), 1200);
     } else {
-      mostrarNotificacion("❌ Error al enviar la orden", "#e74c3c");
+      mostrarNotificacion("Error al enviar la orden", "#e74c3c");
     }
   } catch (err) {
     console.error(err);
-    mostrarNotificacion("❌ Error de conexión", "#e74c3c");
+    mostrarNotificacion("Sin conexión al servidor", "#e74c3c");
   }
 });
 
