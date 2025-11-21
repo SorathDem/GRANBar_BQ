@@ -29,6 +29,39 @@ router.post("/", async (req, res) => {
       mesa,
       items,
       total,
+      status: "pending_printer",  // ← CAMBIADO AQUÍ (antes era "pending_print")
+      createdAt: new Date()       // opcional: fuerza la fecha
+    });
+
+    await order.save();
+    res.status(201).json({ mensaje: "Orden creada", orderId: order._id });
+  } catch (err) {
+    console.error("Error creando orden:", err);
+    res.status(500).json({ error: "Error creando orden" });
+  }
+});router.post("/", async (req, res) => {
+  try {
+    const { productos = [], mesa = "No especificada" } = req.body;
+
+    let total = 0;
+    const items = (productos || []).map(p => {
+      const cantidad = Number(p.cantidad || 1);
+      const precio = Number(p.precio || 0);
+      total += cantidad * precio;
+      return {
+        productId: p._id || null,
+        tipo: p.tipo || "",
+        nombre: p.nombre || p.name || "",
+        cantidad,
+        precio,
+        recomendaciones: p.recomendaciones || p.nota || ""
+      };
+    });
+
+    const order = new Order({
+      mesa,
+      items,
+      total,
       status: "pending_print",
     });
 
