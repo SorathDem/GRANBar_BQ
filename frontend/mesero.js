@@ -105,7 +105,7 @@ enviarOrdenBtn.addEventListener("click", async () => {
     return;
   }
 
-  const mesa = document.getElementById("mesa").value.trim();
+  const mesa = document.getElementById("mesa").value;
   if (!mesa) {
     mostrarNotificacion("Debes seleccionar una mesa", "#f39c12");
     return;
@@ -113,7 +113,7 @@ enviarOrdenBtn.addEventListener("click", async () => {
 
   const payload = {
     mesa,
-    items: orden.map((it) => ({
+    items: orden.map((it) => ({               // ← AQUÍ ESTABA EL ERROR
       _id: it._id,
       tipo: it.category || "",
       nombre: it.name,
@@ -124,23 +124,36 @@ enviarOrdenBtn.addEventListener("click", async () => {
   };
 
   try {
-    const resp = await fetch(`${API_BASE}`, {
+    const resp = await fetch(API_BASE, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     if (resp.ok) {
-      mostrarNotificacion("Orden enviada a impresión", "#27ae60");
+      const data = await resp.json();
+      console.log("Orden creada con éxito:", data);
+
+      mostrarNotificacion("Orden enviada a cocina", "#27ae60");
       orden = [];
       renderOrden();
       document.getElementById("mesa").value = "";
-      setTimeout(() => location.reload(), 1200);
+
+      // Opcional: forzar impresión inmediata
+      setTimeout(async () => {
+        try {
+          await fetch(`${API_BASE}/${data.orden._id}/imprimir`, { method: "PATCH" });
+        } catch (e) { console.log("Ya se imprimió o no hay worker"); }
+      }, 800);
+
+      setTimeout(() => location.reload(), 1800);
     } else {
-      mostrarNotificacion("Error al enviar la orden", "#e74c3c");
+      const error = await resp.text();
+      console.error("Error del servidor:", error);
+      mostrarNotificacion("Error al enviar orden", "#e74c3c");
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error de conexión:", err);
     mostrarNotificacion("Sin conexión al servidor", "#e74c3c");
   }
 });
