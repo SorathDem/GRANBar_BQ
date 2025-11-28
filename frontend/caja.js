@@ -27,13 +27,22 @@ async function imprimirFactura(orderId) {
       headers: { "Content-Type": "application/json" },
     });
 
-    if (!response.ok) throw new Error(await response.text());
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(error || "Error del servidor");
+    }
+
+    const data = await response.json();
+    console.log("Factura enviada:", data);
 
     alert("Factura enviada a impresión");
-    buscarOrdenesPorFecha(fechaInput.value); // Recarga para ver el cambio
+    
+    // Recargar la tabla para ver el cambio de estado
+    buscarOrdenesPorFecha(fechaInput.value);
+
   } catch (error) {
     console.error("Error enviando factura:", error);
-    alert("Error al enviar la factura: " + error.message);
+    alert("Error: " + error.message);
   }
 }
 

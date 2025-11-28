@@ -57,22 +57,34 @@ router.post("/", async (req, res) => {
 });
 
 // IMPRIMIR FACTURA (cambiar estado a pending_ticket)
+// RUTA PARA IMPRIMIR FACTURA (SOLO CAMBIA EL STATUS)
 router.patch("/:id/imprimir-factura", async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       { 
-        status: "pending_ticket",
-        printedTicketAt: new Date()
+        $set: { 
+          status: "pending_ticket",
+          printedAttemptAt: new Date()
+        } 
       },
       { new: true }
     );
 
-    if (!order) return res.status(404).json({ message: "Orden no encontrada" });
+    if (!order) {
+      return res.status(404).json({ error: "Orden no encontrada" });
+    }
 
-    res.json({ message: "Factura enviada a impresión", order });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(`Factura solicitada → Orden ${order._id} | Mesa ${order.mesa} → pending_ticket`);
+    
+    res.json({ 
+      mensaje: "Factura enviada a impresión", 
+      orden: order 
+    });
+
+  } catch (err) {
+    console.error("Error al marcar factura:", err);
+    res.status(500).json({ error: "Error del servidor" });
   }
 });
 
