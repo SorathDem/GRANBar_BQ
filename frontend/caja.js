@@ -159,36 +159,66 @@ cerrarCajaBtn.addEventListener("click", async () => {
 // Modal edición
 function abrirModalEdicion(orden) {
   ordenEditando = orden;
-  editMesa.value = orden.mesa || "";
+
+  // Mesa
+  editMesa.value = orden.mesa || "S/N";
+
+  // Total
   editTotal.value = orden.total || 0;
-  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+
+  // Fecha (ESTA ES LA CLAVE: funciona aunque sea createdAt, fecha, o ISO)
+  let fechaStr = "";
+  if (orden.fecha) {
+    fechaStr = orden.fecha.split("T")[0];
+  } else if (orden.createdAt) {
+    fechaStr = new Date(orden.createdAt).toISOString().split("T")[0];
+  } else {
+    fechaStr = new Date().toISOString().split("T")[0]; // hoy por defecto
+  }
+  editFecha.value = fechaStr;
+
   modalEditar.style.display = "flex";
 }
 
+// CANCELAR
 cancelarEdicionBtn.addEventListener("click", () => {
   modalEditar.style.display = "none";
   ordenEditando = null;
 });
 
+// GUARDAR CAMBIOS (MEJORADO)
 guardarCambiosBtn.addEventListener("click", async () => {
   if (!ordenEditando) return;
+
   const datos = {
-    mesa: editMesa.value,
-    total: Number(editTotal.value),
-    fecha: editFecha.value
+    mesa: editMesa.value.trim() || "S/N",
+    total: Number(editTotal.value) || 0,
+    // Solo enviamos fecha si el campo existe y no está vacío
+    ...(editFecha.value && { fecha: editFecha.value })
   };
+
   try {
     const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(datos)
     });
-    if (!res.ok) throw new Error("Error actualizando");
-    alert("Orden actualizada");
+
+    if (!res.ok) {
+      const error = await res.text();
+      throw new Error(error || "Error del servidor");
+    }
+
+    alert("Orden actualizada correctamente");
     modalEditar.style.display = "none";
+    ordenEditando = null;
+    
+    // Recargar la tabla
     buscarOrdenesPorFecha(fechaInput.value);
+
   } catch (err) {
-    alert("Error al guardar cambios");
+    console.error("Error actualizando orden:", err);
+    alert("Error al guardar: " + err.message);
   }
 });
 
