@@ -5,71 +5,54 @@ import Caja from "../models/caja.js";
 
 const router = express.Router();
 
-// ✅ Crear nueva orden
+// ✅ CREAR ORDEN - VERSIÓN CORREGIDA Y FINAL
 router.post("/", async (req, res) => {
   try {
-    const { productos = [], mesa = "No especificada" } = req.body;
+    const { mesa, items = [] } = req.body;  // ← AHORA LEE "items" COMO DEBE SER
+
+    if (!mesa) {
+      return res.status(400).json({ error: "Falta la mesa" });
+    }
+
+    if (items.length === 0) {
+      return res.status(400).json({ error: "No hay productos en la orden" });
+    }
 
     let total = 0;
-    const items = (productos || []).map(p => {
-      const cantidad = Number(p.cantidad || 1);
-      const precio = Number(p.precio || 0);
+
+    const itemsProcesados = items.map(p => {
+      const cantidad = Number(p.cantidad) || 1;
+      const precio = Number(p.precio) || 0;
       total += cantidad * precio;
+
       return {
         productId: p._id || null,
         tipo: p.tipo || "",
-        nombre: p.nombre || p.name || "",
+        nombre: p.nombre || "Producto sin nombre",
         cantidad,
         precio,
-        recomendaciones: p.recomendaciones || p.nota || ""
+        recomendaciones: p.recomendaciones || ""
       };
     });
 
-    const order = new Order({
+    const nuevaOrden = new Order({
       mesa,
-      items,
+      items: itemsProcesados,
       total,
-      status: "pending_print",  // ← CAMBIADO AQUÍ (antes era "pending_print")
-      createdAt: new Date()       // opcional: fuerza la fecha
+      status: "pending_print",  // ← para que el worker la imprima inmediatamente
+      createdAt: new Date()
     });
 
-    await order.save();
-    res.status(201).json({ mensaje: "Orden creada", orderId: order._id });
+    await nuevaOrden.save();
+
+    res.status(201).json({
+      mensaje: "Orden creada con éxito",
+      orden: nuevaOrden
+    });
+
   } catch (err) {
     console.error("Error creando orden:", err);
-    res.status(500).json({ error: "Error creando orden" });
-  }
-});router.post("/", async (req, res) => {
-  try {
-    const { productos = [], mesa = "No especificada" } = req.body;
-
-    let total = 0;
-    const items = (productos || []).map(p => {
-      const cantidad = Number(p.cantidad || 1);
-      const precio = Number(p.precio || 0);
-      total += cantidad * precio;
-      return {
-        productId: p._id || null,
-        tipo: p.tipo || "",
-        nombre: p.nombre || p.name || "",
-        cantidad,
-        precio,
-        recomendaciones: p.recomendaciones || p.nota || ""
-      };
-    });
-
-    const order = new Order({
-      mesa,
-      items,
-      total,
-      status: "pending_print",
-    });
-
-    await order.save();
-    res.status(201).json({ mensaje: "Orden creada", orderId: order._id });
-  } catch (err) {
-    console.error("Error creando orden:", err);
-    res.status(500).json({ error: "Error creando orden" });
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
