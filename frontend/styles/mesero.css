@@ -11,10 +11,8 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px; /* Padding lateral más pequeño */
-  max-width: 600px; /* Header más angosto */
-  margin: 0 auto; /* Centrado */
-  border-radius: 0 0 15px 15px; /* Opcional: bordes redondeados abajo */
+  padding: 12px 16px;
+  width: 100%;       /* 🔥 ocupa todo el ancho */
 }
 
 header h1 {
@@ -58,9 +56,8 @@ main {
   display: flex;
   flex-direction: column;
   gap: 25px;
-  padding: 10px 10px 20px; /* Padding lateral reducido */
-  max-width: 600px; /* Todo el contenido principal más angosto */
-  margin: 0 auto; /* Centrado en la pantalla */
+  padding: 10px;
+  width: 100%;      /* 🔥 */
 }
 
 /* === SECCIÓN PRODUCTOS === */
@@ -253,60 +250,50 @@ main {
 
 /* === RESPONSIVE OPTIMIZADO PARA CELULAR === */
 @media (max-width: 768px) {
-  body {
-    font-size: 17px;
-  }
 
-  /* Todo el contenido principal aún más angosto en móvil */
-  main {
-    max-width: 520px; /* Más angosto en pantallas pequeñas */
-    padding: 12px;
-    gap: 22px;
+  body {
+    font-size: 16px;
   }
 
   header {
-    max-width: 520px; /* Coherente con main */
-    padding: 12px 14px;
+    padding: 12px;
+  }
+
+  main {
+    padding: 8px;
+    gap: 16px;
   }
 
   .buscador {
-    max-width: 460px; /* Más angosto */
-    font-size: 1.2rem;
-    padding: 16px;
-  }
-
-  .productos, .orden {
-    padding: 20px;
-  }
-
-  .productos h2, .orden h2 {
-    font-size: 1.6rem;
-  }
-
-  header h1 {
-    font-size: 1.5rem;
-  }
-
-  .btn-logout {
     font-size: 1.1rem;
-    padding: 12px 18px;
+    padding: 14px;
+  }
+
+  .productos,
+  .orden {
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .producto-card {
+    padding: 16px;
   }
 
   .producto-card h3 {
-    font-size: 1.45rem !important;
-  }
-
-  .producto-card p {
-    font-size: 1.2rem;
-  }
-
-  .producto-card button {
-    padding: 16px;
     font-size: 1.3rem;
   }
 
+  .producto-card p {
+    font-size: 1.1rem;
+  }
+
+  .producto-card button {
+    font-size: 1.2rem;
+    padding: 14px;
+  }
+
   .btn-enviar {
-    padding: 18px;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    padding: 16px;
   }
 }
