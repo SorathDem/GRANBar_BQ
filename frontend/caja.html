@@ -146,11 +146,12 @@
     const editFecha = document.getElementById("editFecha");
     const guardarCambios = document.getElementById("guardarCambios");
     const cancelarEdicion = document.getElementById("cancelarEdicion");
+    const contenedorProductos = document.getElementById("productosEditarContainer");
 
     // 🔹 contenedor para productos en el modal
-    let contenedorProductos;
     let ordenActual = null;
     let itemsEditando = [];
+
 
     // 🔓 Cerrar sesión
     logoutBtn.addEventListener("click", () => {
@@ -254,18 +255,19 @@
 
 function abrirModalEdicion(orden) {
   ordenActual = orden;
-  itemsEditando = JSON.parse(JSON.stringify(orden.items)); // copia segura
+  itemsEditando = JSON.parse(JSON.stringify(orden.items));
 
   editMesa.value = orden.mesa || "";
-  editFecha.value = orden.fecha;
-  
+  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+
   renderProductos();
   calcularTotal();
 
   modalEditar.style.display = "flex";
 }
+
 function renderProductos() {
-  contenedorProductos.innerHTML = "<h4>Productos</h4>";
+  contenedorProductos.innerHTML = "";
 
   itemsEditando.forEach((item, index) => {
     const div = document.createElement("div");
@@ -273,40 +275,105 @@ function renderProductos() {
     div.style.padding = "8px";
     div.style.marginBottom = "6px";
 
-    div.innerHTML = `
-      <input value="${item.nombre}" 
-        placeholder="Nombre"
-        onchange="actualizarItem(${index}, 'nombre', this.value)">
+    const inputNombre = document.createElement("input");
+    inputNombre.value = item.nombre;
+    inputNombre.placeholder = "Nombre";
+    inputNombre.addEventListener("input", e => {
+      itemsEditando[index].nombre = e.target.value;
+    });
 
-      <input type="number" value="${item.cantidad}" min="1"
-        onchange="actualizarItem(${index}, 'cantidad', this.value)">
+    const inputCantidad = document.createElement("input");
+    inputCantidad.type = "number";
+    inputCantidad.min = 1;
+    inputCantidad.value = item.cantidad;
+    inputCantidad.addEventListener("input", e => {
+      itemsEditando[index].cantidad = Number(e.target.value);
+      calcularTotal();
+    });
 
-      <input type="number" value="${item.precio}" min="0"
-        onchange="actualizarItem(${index}, 'precio', this.value)">
+    const inputPrecio = document.createElement("input");
+    inputPrecio.type = "number";
+    inputPrecio.min = 0;
+    inputPrecio.value = item.precio || 0;
+    inputPrecio.addEventListener("input", e => {
+      itemsEditando[index].precio = Number(e.target.value);
+      calcularTotal();
+    });
 
-      <input value="${item.recomendaciones || ''}"
-        placeholder="Recomendaciones"
-        onchange="actualizarItem(${index}, 'recomendaciones', this.value)">
+    const inputRec = document.createElement("input");
+    inputRec.placeholder = "Recomendaciones";
+    inputRec.value = item.recomendaciones || "";
+    inputRec.addEventListener("input", e => {
+      itemsEditando[index].recomendaciones = e.target.value;
+    });
 
-      <button onclick="eliminarProducto(${index})">🗑</button>
-    `;
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "🗑";
+    btnEliminar.addEventListener("click", () => {
+      itemsEditando.splice(index, 1);
+      renderProductos();
+      calcularTotal();
+    });
 
+    div.append(inputNombre, inputCantidad, inputPrecio, inputRec, btnEliminar);
     contenedorProductos.appendChild(div);
   });
 
   const btnAgregar = document.createElement("button");
   btnAgregar.textContent = "➕ Agregar producto";
-  btnAgregar.onclick = agregarProducto;
+  btnAgregar.style.marginTop = "10px";
+  btnAgregar.addEventListener("click", agregarProducto);
+
   contenedorProductos.appendChild(btnAgregar);
 }
-function actualizarItem(index, campo, valor) {
-  itemsEditando[index][campo] =
-    campo === "cantidad" || campo === "precio"
-      ? Number(valor)
-      : valor;
 
-  calcularTotal();
+function agregarProducto() {
+  itemsEditando.push({
+    nombre: "",
+    cantidad: 1,
+    precio: 0,
+    recomendaciones: ""
+  });
+
+  renderProductos();
 }
+
+function calcularTotal() {
+  const total = itemsEditando.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+  editTotal.value = total;
+}
+
+guardarCambios.addEventListener("click", async () => {
+  if (!ordenActual) return;
+
+  const datosActualizados = {
+    mesa: editMesa.value,
+    fecha: editFecha.value,
+    items: itemsEditando,
+    total: Number(editTotal.value)
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/${ordenActual._id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datosActualizados)
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+
+    alert("✅ Orden actualizada");
+    modalEditar.style.display = "none";
+    buscarOrdenesPorFecha(fechaInput.value);
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error al actualizar la orden");
+  }
+});
+
 
 function eliminarProducto(index) {
   itemsEditando.splice(index, 1);
