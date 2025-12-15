@@ -149,6 +149,8 @@
 
     // 🔹 contenedor para productos en el modal
     let contenedorProductos;
+    let ordenActual = null;
+    let itemsEditando = [];
 
     // 🔓 Cerrar sesión
     logoutBtn.addEventListener("click", () => {
@@ -250,32 +252,30 @@
       totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
     }
 
-let ordenActual = null;
-let itemsEditando = [];
-
-// Modal edición
 function abrirModalEdicion(orden) {
   ordenActual = orden;
   itemsEditando = JSON.parse(JSON.stringify(orden.items)); // copia segura
 
   editMesa.value = orden.mesa || "";
   editFecha.value = orden.fecha;
-
-  renderItems();
+  
+  renderProductos();
   calcularTotal();
 
   modalEditar.style.display = "flex";
 }
-
-function renderItems() {
+function renderProductos() {
   contenedorProductos.innerHTML = "<h4>Productos</h4>";
 
   itemsEditando.forEach((item, index) => {
     const div = document.createElement("div");
-    div.classList.add("item-edicion");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "8px";
+    div.style.marginBottom = "6px";
 
     div.innerHTML = `
-      <input type="text" value="${item.nombre}" 
+      <input value="${item.nombre}" 
+        placeholder="Nombre"
         onchange="actualizarItem(${index}, 'nombre', this.value)">
 
       <input type="number" value="${item.cantidad}" min="1"
@@ -284,21 +284,21 @@ function renderItems() {
       <input type="number" value="${item.precio}" min="0"
         onchange="actualizarItem(${index}, 'precio', this.value)">
 
-      <input type="text" value="${item.recomendaciones || ''}"
+      <input value="${item.recomendaciones || ''}"
+        placeholder="Recomendaciones"
         onchange="actualizarItem(${index}, 'recomendaciones', this.value)">
 
-      <button onclick="eliminarItem(${index})">🗑</button>
+      <button onclick="eliminarProducto(${index})">🗑</button>
     `;
 
     contenedorProductos.appendChild(div);
   });
 
-  const btnAdd = document.createElement("button");
-  btnAdd.textContent = "➕ Agregar producto";
-  btnAdd.onclick = agregarProducto;
-  contenedorProductos.appendChild(btnAdd);
+  const btnAgregar = document.createElement("button");
+  btnAgregar.textContent = "➕ Agregar producto";
+  btnAgregar.onclick = agregarProducto;
+  contenedorProductos.appendChild(btnAgregar);
 }
-
 function actualizarItem(index, campo, valor) {
   itemsEditando[index][campo] =
     campo === "cantidad" || campo === "precio"
@@ -308,9 +308,9 @@ function actualizarItem(index, campo, valor) {
   calcularTotal();
 }
 
-function eliminarItem(index) {
+function eliminarProducto(index) {
   itemsEditando.splice(index, 1);
-  renderItems();
+  renderProductos();
   calcularTotal();
 }
 
@@ -323,7 +323,7 @@ function agregarProducto() {
     recomendaciones: ""
   });
 
-  renderItems();
+  renderProductos();
 }
 
 function calcularTotal() {
@@ -331,41 +331,16 @@ function calcularTotal() {
     (sum, item) => sum + item.cantidad * item.precio,
     0
   );
-
   editTotal.value = total;
 }
 
-cancelarEdicionBtn.addEventListener("click", () => {
-  modalEditar.style.display = "none";
-  ordenEditando = null;
-});
+const datosActualizados = {
+  mesa: editMesa.value,
+  fecha: editFecha.value,
+  items: itemsEditando,
+  total: Number(editTotal.value)
+};
 
-guardarCambios.addEventListener("click", async () => {
-  if (!ordenActual) return;
-
-  const datos = {
-    mesa: editMesa.value,
-    fecha: editFecha.value,
-    items: itemsEditando,
-    total: Number(editTotal.value),
-  };
-
-  try {
-    const res = await fetch(`${API_BASE}/${ordenActual._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos),
-    });
-
-    if (!res.ok) throw new Error(await res.text());
-
-    alert("✅ Orden actualizada");
-    modalEditar.style.display = "none";
-    buscarOrdenesPorFecha(fechaInput.value);
-  } catch (e) {
-    alert("❌ Error al guardar");
-  }
-});
 
     // 🗑️ Eliminar orden
     async function eliminarOrden(id) {
