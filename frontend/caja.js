@@ -156,13 +156,89 @@ cerrarCajaBtn.addEventListener("click", async () => {
   }
 });
 
+let ordenActual = null;
+let itemsEditando = [];
+
 // Modal edición
 function abrirModalEdicion(orden) {
-  ordenEditando = orden;
+  ordenActual = orden;
+  itemsEditando = JSON.parse(JSON.stringify(orden.items)); // copia segura
+
   editMesa.value = orden.mesa || "";
-  editTotal.value = orden.total || 0;
-  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+  editFecha.value = orden.fecha;
+
+  renderItems();
+  calcularTotal();
+
   modalEditar.style.display = "flex";
+}
+
+function renderItems() {
+  contenedorProductos.innerHTML = "<h4>Productos</h4>";
+
+  itemsEditando.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.classList.add("item-edicion");
+
+    div.innerHTML = `
+      <input type="text" value="${item.nombre}" 
+        onchange="actualizarItem(${index}, 'nombre', this.value)">
+
+      <input type="number" value="${item.cantidad}" min="1"
+        onchange="actualizarItem(${index}, 'cantidad', this.value)">
+
+      <input type="number" value="${item.precio}" min="0"
+        onchange="actualizarItem(${index}, 'precio', this.value)">
+
+      <input type="text" value="${item.recomendaciones || ''}"
+        onchange="actualizarItem(${index}, 'recomendaciones', this.value)">
+
+      <button onclick="eliminarItem(${index})">🗑</button>
+    `;
+
+    contenedorProductos.appendChild(div);
+  });
+
+  const btnAdd = document.createElement("button");
+  btnAdd.textContent = "➕ Agregar producto";
+  btnAdd.onclick = agregarProducto;
+  contenedorProductos.appendChild(btnAdd);
+}
+
+function actualizarItem(index, campo, valor) {
+  itemsEditando[index][campo] =
+    campo === "cantidad" || campo === "precio"
+      ? Number(valor)
+      : valor;
+
+  calcularTotal();
+}
+
+function eliminarItem(index) {
+  itemsEditando.splice(index, 1);
+  renderItems();
+  calcularTotal();
+}
+
+function agregarProducto() {
+  itemsEditando.push({
+    nombre: "",
+    cantidad: 1,
+    precio: 0,
+    tipo: "Manual",
+    recomendaciones: ""
+  });
+
+  renderItems();
+}
+
+function calcularTotal() {
+  const total = itemsEditando.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+
+  editTotal.value = total;
 }
 
 cancelarEdicionBtn.addEventListener("click", () => {
@@ -170,25 +246,30 @@ cancelarEdicionBtn.addEventListener("click", () => {
   ordenEditando = null;
 });
 
-guardarCambiosBtn.addEventListener("click", async () => {
-  if (!ordenEditando) return;
+guardarCambios.addEventListener("click", async () => {
+  if (!ordenActual) return;
+
   const datos = {
     mesa: editMesa.value,
+    fecha: editFecha.value,
+    items: itemsEditando,
     total: Number(editTotal.value),
-    fecha: editFecha.value
   };
+
   try {
-    const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
+    const res = await fetch(`${API_BASE}/${ordenActual._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
+      body: JSON.stringify(datos),
     });
-    if (!res.ok) throw new Error("Error actualizando");
-    alert("Orden actualizada");
+
+    if (!res.ok) throw new Error(await res.text());
+
+    alert("✅ Orden actualizada");
     modalEditar.style.display = "none";
     buscarOrdenesPorFecha(fechaInput.value);
-  } catch (err) {
-    alert("Error al guardar cambios");
+  } catch (e) {
+    alert("❌ Error al guardar");
   }
 });
 

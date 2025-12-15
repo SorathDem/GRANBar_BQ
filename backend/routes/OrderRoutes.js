@@ -166,7 +166,11 @@ router.put("/:id", async (req, res) => {
     const datosActualizados = req.body;
 
     // Busca y actualiza la orden
-    const ordenActualizada = await Order.findByIdAndUpdate(id, datosActualizados, { new: true });
+    const ordenActualizada = await Order.findByIdAndUpdate(
+  id,
+  datosActualizados,
+  { new: true, runValidators: true }
+);
 
     if (!ordenActualizada) {
       return res.status(404).json({ error: "Orden no encontrada" });
