@@ -4,35 +4,17 @@ body {
   background-color: #f8f9fa;
 }
 
-/* === HEADER (CORREGIDO Y MÁS ANGOSTO) === */
-header {
-  background: #212529;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* === HEADER === */
 
-  /* MÁS COMPACTO */
-  padding: 4px 10px;
-  min-height: 44px;
-
-  box-sizing: border-box;
-}
-
-header h1 {
-  font-size: 1.1rem;
-  margin: 0;
-  line-height: 1;
-}
 
 .btn-logout {
   background: #dc3545;
   border: none;
   color: white;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .btn-logout:hover {
@@ -46,7 +28,7 @@ header h1 {
   max-width: 600px;
   margin: 15px auto;
   padding: 12px 15px;
-  font-size: 1.1rem;
+  font-size: 1.1rem; /* Un poco más grande en móvil */
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
@@ -70,7 +52,7 @@ main {
 /* === SECCIÓN PRODUCTOS === */
 .productos {
   background-color: #fff;
-  padding: 15px;
+  padding: 15px; /* Más padding */
   border-radius: 15px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
@@ -79,14 +61,14 @@ main {
   margin-bottom: 15px;
   color: #333;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.5rem; /* Título más grande */
 }
 
 .productos-scroll {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-height: 70vh;
+  gap: 18px; /* Más separación entre tarjetas */
+  max-height: 70vh; /* Más espacio útil en móvil */
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 8px;
@@ -94,6 +76,7 @@ main {
   scrollbar-color: #007bff #f1f1f1;
 }
 
+/* Scroll personalizado */
 .productos-scroll::-webkit-scrollbar {
   width: 8px;
 }
@@ -105,27 +88,29 @@ main {
   background-color: #f1f1f1;
 }
 
-/* === TARJETAS DE PRODUCTO === */
+/* Tarjetas de producto - OPTIMIZADAS PARA MÓVIL */
 .producto-card {
   border: 1px solid #ddd;
   border-radius: 14px;
-  padding: 20px 18px;
+  padding: 20px 18px; /* Mucho más padding para mayor comodidad */
   background-color: #fefefe;
   display: flex;
   flex-direction: column;
   gap: 12px;
   transition: transform 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08); /* Sombra suave para destacar */
 }
 
+/* NOMBRE DEL PRODUCTO MÁS GRANDE Y DESTACADO */
 .producto-card h3 {
-  font-size: 1.35rem;
+  font-size: 1.35rem; /* Nombre bien grande y legible */
   font-weight: bold;
   color: #222;
   margin: 0;
   line-height: 1.3;
 }
 
+/* Precio y otros textos secundarios */
 .producto-card p {
   font-size: 1.15rem;
   color: #555;
@@ -141,7 +126,7 @@ main {
   color: white;
   border: none;
   border-radius: 10px;
-  padding: 14px 18px;
+  padding: 14px 18px; /* Botón más grande y fácil de tocar */
   cursor: pointer;
   font-size: 1.2rem;
   font-weight: bold;
@@ -168,7 +153,7 @@ main {
 }
 
 .orden-lista {
-  max-height: 45vh;
+  max-height: 45vh; /* Más espacio en móvil */
   overflow-y: auto;
   border: 1px solid #ddd;
   padding: 12px;
@@ -185,10 +170,10 @@ main {
   padding-bottom: 10px;
   flex-wrap: wrap;
   gap: 12px;
-  font-size: 1.15rem;
+  font-size: 1.15rem; /* Texto más grande en ítems de orden */
 }
 
-/* === MESA === */
+/* Mesa */
 .mesa-input {
   display: flex;
   align-items: center;
@@ -210,13 +195,13 @@ main {
   font-size: 1.15rem;
 }
 
-/* === BOTÓN ENVIAR === */
+/* Botón enviar */
 .btn-enviar {
   background-color: #28a745;
   color: white;
   border: none;
   border-radius: 10px;
-  padding: 16px 20px;
+  padding: 16px 20px; /* Más grande */
   cursor: pointer;
   margin-top: 15px;
   width: 100%;
@@ -225,7 +210,7 @@ main {
 }
 
 .btn-enviar:hover {
-  background: #218838;
+  background-color: #218838;
 }
 
 /* === NOTIFICACIÓN === */
@@ -252,10 +237,10 @@ main {
   100% { opacity: 0; transform: translate(-50%, -20px); }
 }
 
-/* === RESPONSIVE CELULAR === */
+/* === RESPONSIVE OPTIMIZADO PARA CELULAR === */
 @media (max-width: 768px) {
   body {
-    font-size: 17px;
+    font-size: 17px; /* Base más grande para todo */
   }
 
   main {
@@ -276,8 +261,18 @@ main {
     padding: 16px;
   }
 
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .btn-logout {
+    font-size: 1.1rem;
+    padding: 12px 18px;
+  }
+
+  /* Aseguramos que las tarjetas sean grandes y legibles */
   .producto-card h3 {
-    font-size: 1.45rem;
+    font-size: 1.45rem !important;
   }
 
   .producto-card p {
@@ -292,22 +287,5 @@ main {
   .btn-enviar {
     padding: 18px;
     font-size: 1.4rem;
-  }
-}
-
-/* === EXTRA: HEADER AÚN MÁS ANGOSTO EN CELULARES PEQUEÑOS === */
-@media (max-width: 480px) {
-  header {
-    padding: 3px 8px;
-    min-height: 40px;
-  }
-
-  header h1 {
-    font-size: 1rem;
-  }
-
-  .btn-logout {
-    padding: 5px 8px;
-    font-size: 0.85rem;
   }
 }
