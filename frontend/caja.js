@@ -166,6 +166,132 @@ function abrirModalEdicion(orden) {
   modalEditar.style.display = "flex";
 }
 
+// === CATÁLOGO DE PRODUCTOS ===
+const selectProductos = document.getElementById("selectProductos");
+const contenedorProductos = document.getElementById("productosEditarContainer");
+
+let itemsEditando = [];
+
+async function cargarCatalogo() {
+  try {
+    const res = await fetch(API_URL);
+
+    if (!res.ok) {
+      throw new Error("Error al cargar productos");
+    }
+
+    const data = await res.json();
+
+    // Soporta ambos formatos:
+    const productos = Array.isArray(data)
+      ? data
+      : data.productos || [];
+
+    selectProductos.innerHTML = "";
+
+    if (productos.length === 0) {
+      const opt = document.createElement("option");
+      opt.textContent = "No hay productos";
+      selectProductos.appendChild(opt);
+      return;
+    }
+
+    productos.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(p);
+      opt.textContent = `${p.nombre} - $${p.precio}`;
+      selectProductos.appendChild(opt);
+    });
+
+  } catch (error) {
+    console.error("❌ Error cargando catálogo:", error);
+  }
+}
+
+document.getElementById("btnAgregarCatalogo").addEventListener("click", () => {
+  if (!selectProductos.value) return;
+
+  const producto = JSON.parse(selectProductos.value);
+
+  const existente = itemsEditando.find(p => p.nombre === producto.nombre);
+
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    itemsEditando.push({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: 1,
+      recomendaciones: ""
+    });
+  }
+
+  renderProductos();
+  calcularTotal();
+});
+
+function renderProductos() {
+  contenedorProductos.innerHTML = "";
+
+  itemsEditando.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "8px";
+    div.style.marginBottom = "6px";
+
+    const inputNombre = document.createElement("input");
+    inputNombre.value = item.nombre;
+    inputNombre.addEventListener("input", e => {
+      itemsEditando[index].nombre = e.target.value;
+    });
+
+    const inputCantidad = document.createElement("input");
+    inputCantidad.type = "number";
+    inputCantidad.min = 1;
+    inputCantidad.value = item.cantidad;
+    inputCantidad.addEventListener("input", e => {
+      itemsEditando[index].cantidad = Number(e.target.value);
+      calcularTotal();
+    });
+
+    const inputPrecio = document.createElement("input");
+    inputPrecio.type = "number";
+    inputPrecio.min = 0;
+    inputPrecio.value = item.precio;
+    inputPrecio.addEventListener("input", e => {
+      itemsEditando[index].precio = Number(e.target.value);
+      calcularTotal();
+    });
+
+    const inputRec = document.createElement("input");
+    inputRec.placeholder = "Recomendaciones";
+    inputRec.value = item.recomendaciones || "";
+    inputRec.addEventListener("input", e => {
+      itemsEditando[index].recomendaciones = e.target.value;
+    });
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "🗑";
+    btnEliminar.addEventListener("click", () => {
+      itemsEditando.splice(index, 1);
+      renderProductos();
+      calcularTotal();
+    });
+
+    div.append(inputNombre, inputCantidad, inputPrecio, inputRec, btnEliminar);
+    contenedorProductos.appendChild(div);
+  });
+}
+
+
+function calcularTotal() {
+  const total = itemsEditando.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+  editTotal.value = total;
+}
+
 cancelarEdicionBtn.addEventListener("click", () => {
   modalEditar.style.display = "none";
   ordenEditando = null;
