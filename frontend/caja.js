@@ -107,6 +107,7 @@ function renderOrdenes(ordenes) {
   totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
 }
 
+
 // === TUS DEMÁS FUNCIONES (SIN CAMBIOS) ===
 async function buscarOrdenesPorFecha(fechaSeleccionada) {
   if (!fechaSeleccionada) {
@@ -134,37 +135,6 @@ async function buscarOrdenesPorFecha(fechaSeleccionada) {
 buscarBtn.addEventListener("click", () => {
   buscarOrdenesPorFecha(fechaInput.value);
 });
-
-// Cerrar caja
-cerrarCajaBtn.addEventListener("click", async () => {
-  const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
-  const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
-  if (!confirmacion) return;
-  try {
-    const response = await fetch(`${API_BASE}/cerrar-caja`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fecha: fechaSeleccionada }),
-    });
-    if (!response.ok) throw new Error(await response.text());
-    const data = await response.json();
-    alert(`Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
-  } catch (error) {
-    console.error("Error cerrando caja:", error);
-    alert("Error al cerrar la caja.");
-  }
-});
-
-
-// Modal edición
-function abrirModalEdicion(orden) {
-  ordenEditando = orden;
-  editMesa.value = orden.mesa || "";
-  editTotal.value = orden.total || 0;
-  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
-  modalEditar.style.display = "flex";
-}
 
 // === CATÁLOGO DE PRODUCTOS ===
 const selectProductos = document.getElementById("selectProductos");
@@ -283,6 +253,14 @@ function renderProductos() {
   });
 }
 
+function calcularTotal() {
+  const total = itemsEditando.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+  editTotal.value = total;
+}
+
 function abrirModalEdicion(orden) {
   ordenEditando = orden;
   itemsEditando = JSON.parse(JSON.stringify(orden.items));
@@ -297,14 +275,26 @@ function abrirModalEdicion(orden) {
   modalEditar.style.display = "flex";
 }
 
-
-function calcularTotal() {
-  const total = itemsEditando.reduce(
-    (sum, item) => sum + item.cantidad * item.precio,
-    0
-  );
-  editTotal.value = total;
-}
+// Cerrar caja
+cerrarCajaBtn.addEventListener("click", async () => {
+  const fechaSeleccionada = fechaInput.value;
+  if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
+  const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
+  if (!confirmacion) return;
+  try {
+    const response = await fetch(`${API_BASE}/cerrar-caja`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fecha: fechaSeleccionada }),
+    });
+    if (!response.ok) throw new Error(await response.text());
+    const data = await response.json();
+    alert(`Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
+  } catch (error) {
+    console.error("Error cerrando caja:", error);
+    alert("Error al cerrar la caja.");
+  }
+});
 
 cancelarEdicionBtn.addEventListener("click", () => {
   modalEditar.style.display = "none";
