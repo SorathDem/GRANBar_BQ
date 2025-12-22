@@ -46,6 +46,22 @@ async function imprimirFactura(orderId) {
   }
 }
 
+const selectProductos = document.getElementById("selectProductos");
+
+    async function cargarCatalogo() {
+      const res = await fetch(`${API_URL}/productos`);
+      const productos = await res.json();
+
+      selectProductos.innerHTML = "";
+
+      productos.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(p);
+        opt.textContent = `${p.nombre} - $${p.precio}`;
+        selectProductos.appendChild(opt);
+      });
+    }
+    
 // === RENDERIZAR ÓRDENES CON BOTÓN DE IMPRIMIR FACTURA ===
 function renderOrdenes(ordenes) {
   tablaBody.innerHTML = "";
