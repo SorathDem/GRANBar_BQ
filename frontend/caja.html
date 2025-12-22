@@ -115,7 +115,10 @@
       <input type="date" id="editFecha" class="input-edit" style="width:100%; margin-bottom:10px;">
       <h4 style="margin-top:15px;">🛒 Productos</h4>
       <div id="productosEditarContainer" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:6px; margin-bottom:15px;">
-        <!-- Aquí se insertan dinámicamente los productos -->
+        <h4>📋 Catálogo</h4>
+      <select id="selectProductos"></select>
+      <button id="btnAgregarCatalogo">Agregar</button>
+
       </div>
       <div style="text-align:right; margin-top:10px;">
         <button id="guardarCambios">Guardar</button>
@@ -258,13 +261,15 @@ function abrirModalEdicion(orden) {
   itemsEditando = JSON.parse(JSON.stringify(orden.items));
 
   editMesa.value = orden.mesa || "";
-  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+  editFecha.value = orden.fecha?.split("T")[0] || "";
 
+  cargarCatalogo();   // 🔥 AQUÍ
   renderProductos();
   calcularTotal();
 
   modalEditar.style.display = "flex";
 }
+
 
 function renderProductos() {
   contenedorProductos.innerHTML = "";
@@ -319,13 +324,46 @@ function renderProductos() {
     contenedorProductos.appendChild(div);
   });
 
-  const btnAgregar = document.createElement("button");
-  btnAgregar.textContent = "➕ Agregar producto";
-  btnAgregar.style.marginTop = "10px";
-  btnAgregar.addEventListener("click", agregarProducto);
+  const btnAgregar = document
+  .getElementById("btnAgregarCatalogo")
+  .addEventListener("click", () => {
+    const producto = JSON.parse(selectProductos.value);
 
-  contenedorProductos.appendChild(btnAgregar);
+    const existente = itemsEditando.find(p => p.nombre === producto.nombre);
+
+    if (existente) {
+      existente.cantidad++;
+    } else {
+      itemsEditando.push({
+        nombre: producto.nombre,
+        precio: producto.precio,
+        cantidad: 1,
+        recomendaciones: ""
+      });
+    }
+
+    renderProductos();
+    calcularTotal();
+  });
+
 }
+
+const selectProductos = document.getElementById("selectProductos");
+
+async function cargarCatalogo() {
+  const res = await fetch(`${API_BASE}/productos`);
+  const productos = await res.json();
+
+  selectProductos.innerHTML = "";
+
+  productos.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = JSON.stringify(p);
+    opt.textContent = `${p.nombre} - $${p.precio}`;
+    selectProductos.appendChild(opt);
+  });
+}
+
 
 function agregarProducto() {
   itemsEditando.push({
@@ -379,26 +417,6 @@ function eliminarProducto(index) {
   itemsEditando.splice(index, 1);
   renderProductos();
   calcularTotal();
-}
-
-function agregarProducto() {
-  itemsEditando.push({
-    nombre: "",
-    cantidad: 1,
-    precio: 0,
-    tipo: "Manual",
-    recomendaciones: ""
-  });
-
-  renderProductos();
-}
-
-function calcularTotal() {
-  const total = itemsEditando.reduce(
-    (sum, item) => sum + item.cantidad * item.precio,
-    0
-  );
-  editTotal.value = total;
 }
 
 const datosActualizados = {
