@@ -314,12 +314,10 @@ cancelarEdicionBtn.addEventListener("click", () => {
 guardarCambiosBtn.addEventListener("click", async () => {
   if (!ordenEditando) return;
   const datos = {
-  mesa: editMesa.value,
-  fecha: editFecha.value,
-  items: itemsEditando,
-  total: Number(editTotal.value)
-};
-
+    mesa: editMesa.value,
+    total: Number(editTotal.value),
+    fecha: editFecha.value
+  };
   try {
     const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
       method: "PUT",
