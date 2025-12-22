@@ -211,6 +211,8 @@
     }
 
     const productos = await res.json();
+    console.log("RESPUESTA PRODUCTOS 👉", productos);
+
 
     if (!Array.isArray(productos)) {
       console.error("La API no devolvió un array:", productos);
