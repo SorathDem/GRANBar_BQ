@@ -114,11 +114,11 @@
       <label>Fecha:</label>
       <input type="date" id="editFecha" class="input-edit" style="width:100%; margin-bottom:10px;">
       <h4 style="margin-top:15px;">🛒 Productos</h4>
+      <div id="catalogoContainer">
+        <select id="selectProductos"></select>
+        <button id="btnAgregarCatalogo">Agregar</button>
+      </div>
       <div id="productosEditarContainer" style="max-height:200px; overflow-y:auto; border:1px solid #ddd; padding:10px; border-radius:6px; margin-bottom:15px;">
-        <h4>📋 Catálogo</h4>
-      <select id="selectProductos"></select>
-      <button id="btnAgregarCatalogo">Agregar</button>
-
       </div>
       <div style="text-align:right; margin-top:10px;">
         <button id="guardarCambios">Guardar</button>
@@ -202,19 +202,36 @@
     
     const selectProductos = document.getElementById("selectProductos");
 
-    async function cargarCatalogo() {
-      const res = await fetch(`${API_URL}/productos`);
-      const productos = await res.json();
+   async function cargarCatalogo() {
+  try {
+    const res = await fetch(API_URL);
 
-      selectProductos.innerHTML = "";
-
-      productos.forEach(p => {
-        const opt = document.createElement("option");
-        opt.value = JSON.stringify(p);
-        opt.textContent = `${p.nombre} - $${p.precio}`;
-        selectProductos.appendChild(opt);
-      });
+    if (!res.ok) {
+      throw new Error("Error al cargar productos");
     }
+
+    const productos = await res.json();
+
+    if (!Array.isArray(productos)) {
+      console.error("La API no devolvió un array:", productos);
+      return;
+    }
+
+    selectProductos.innerHTML = "";
+
+    productos.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(p);
+      opt.textContent = `${p.nombre} - $${p.precio}`;
+      selectProductos.appendChild(opt);
+    });
+
+  } catch (error) {
+    console.error("❌ Error cargando catálogo:", error);
+  }
+}
+
+
     // 🧾 Renderizar órdenes con botones de acción
     function renderOrdenes(ordenes) {
       tablaBody.innerHTML = "";
@@ -340,27 +357,26 @@ function renderProductos() {
     contenedorProductos.appendChild(div);
   });
 
-  const btnAgregar = document
-  .getElementById("btnAgregarCatalogo")
-  .addEventListener("click", () => {
-    const producto = JSON.parse(selectProductos.value);
+  const btnAgregar = document.getElementById("btnAgregarCatalogo").addEventListener("click", () => {
+  const producto = JSON.parse(selectProductos.value);
 
-    const existente = itemsEditando.find(p => p.nombre === producto.nombre);
+  const existente = itemsEditando.find(p => p.nombre === producto.nombre);
 
-    if (existente) {
-      existente.cantidad++;
-    } else {
-      itemsEditando.push({
-        nombre: producto.nombre,
-        precio: producto.precio,
-        cantidad: 1,
-        recomendaciones: ""
-      });
-    }
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    itemsEditando.push({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: 1,
+      recomendaciones: ""
+    });
+  }
 
-    renderProductos();
-    calcularTotal();
-  });
+  renderProductos();
+  calcularTotal();
+});
+
 
 }
 
