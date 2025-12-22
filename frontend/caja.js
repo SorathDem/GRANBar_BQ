@@ -61,7 +61,21 @@ const selectProductos = document.getElementById("selectProductos");
         selectProductos.appendChild(opt);
       });
     }
-    
+
+
+    function abrirModalEdicion(orden) {
+  ordenActual = orden;
+  itemsEditando = JSON.parse(JSON.stringify(orden.items));
+
+  editMesa.value = orden.mesa || "";
+  editFecha.value = orden.fecha?.split("T")[0] || "";
+
+  cargarCatalogo();   // 🔥 AQUÍ
+  renderProductos();
+  calcularTotal();
+
+  modalEditar.style.display = "flex";
+}
 // === RENDERIZAR ÓRDENES CON BOTÓN DE IMPRIMIR FACTURA ===
 function renderOrdenes(ordenes) {
   tablaBody.innerHTML = "";
