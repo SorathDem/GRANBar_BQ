@@ -199,6 +199,22 @@
       buscarOrdenesPorFecha(fechaInput.value);
     });
 
+    
+    const selectProductos = document.getElementById("selectProductos");
+
+    async function cargarCatalogo() {
+      const res = await fetch(`${API_BASE}/productos`);
+      const productos = await res.json();
+
+      selectProductos.innerHTML = "";
+
+      productos.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = JSON.stringify(p);
+        opt.textContent = `${p.nombre} - $${p.precio}`;
+        selectProductos.appendChild(opt);
+      });
+    }
     // 🧾 Renderizar órdenes con botones de acción
     function renderOrdenes(ordenes) {
       tablaBody.innerHTML = "";
@@ -348,21 +364,6 @@ function renderProductos() {
 
 }
 
-const selectProductos = document.getElementById("selectProductos");
-
-async function cargarCatalogo() {
-  const res = await fetch(`${API_BASE}/productos`);
-  const productos = await res.json();
-
-  selectProductos.innerHTML = "";
-
-  productos.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = JSON.stringify(p);
-    opt.textContent = `${p.nombre} - $${p.precio}`;
-    selectProductos.appendChild(opt);
-  });
-}
 
 
 function agregarProducto() {
