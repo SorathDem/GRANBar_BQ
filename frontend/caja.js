@@ -196,7 +196,7 @@ guardarCambiosBtn.addEventListener("click", async () => {
 async function eliminarOrden(id) {
   if (!confirm("¿Seguro que deseas eliminar esta orden?")) return;
   try {
-    const res = await fetch(`${API_BASE}/ordenes/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Error eliminando");
     alert("Orden eliminada");
     buscarOrdenesPorFecha(fechaInput.value);
