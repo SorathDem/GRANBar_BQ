@@ -79,7 +79,7 @@ main {
 
 .productos h2 {
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 2.3rem;
   margin-bottom: 14px;
 }
 
@@ -108,16 +108,16 @@ main {
 }
 
 .producto-card h3 {
-  font-size: 1.6rem;
+  font-size: 2.1rem;
   font-weight: 800;
   margin: 0;
   line-height: 1.3;
 }
 
 .producto-card p {
-  font-size: 1.35rem;
+  font-size: 1.75rem;
   font-weight: 600;
-  color: #198754;
+  color: #222;
   margin: 0;
 }
 
@@ -145,7 +145,7 @@ main {
 
 .orden h2 {
   text-align: center;
-  font-size: 1.6rem;
+  font-size: 2.1rem;
   margin-bottom: 14px;
 }
 
