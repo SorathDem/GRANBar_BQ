@@ -283,6 +283,20 @@ function renderProductos() {
   });
 }
 
+function abrirModalEdicion(orden) {
+  ordenEditando = orden;
+  itemsEditando = JSON.parse(JSON.stringify(orden.items));
+
+  editMesa.value = orden.mesa || "";
+  editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+
+  cargarCatalogo();
+  renderProductos();
+  calcularTotal();
+
+  modalEditar.style.display = "flex";
+}
+
 
 function calcularTotal() {
   const total = itemsEditando.reduce(
@@ -300,10 +314,12 @@ cancelarEdicionBtn.addEventListener("click", () => {
 guardarCambiosBtn.addEventListener("click", async () => {
   if (!ordenEditando) return;
   const datos = {
-    mesa: editMesa.value,
-    total: Number(editTotal.value),
-    fecha: editFecha.value
-  };
+  mesa: editMesa.value,
+  fecha: editFecha.value,
+  items: itemsEditando,
+  total: Number(editTotal.value)
+};
+
   try {
     const res = await fetch(`${API_BASE}/${ordenEditando._id}`, {
       method: "PUT",
