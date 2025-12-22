@@ -167,9 +167,15 @@ async function cargarCatalogo() {
     }
 
     productos.forEach(p => {
+      const productoNormalizado = {
+        id: p._id || p.id,
+        nombre: p.nombre || p.name || p.producto,
+        precio: p.precio || p.price || p.valor || 0
+      };
+
       const opt = document.createElement("option");
-      opt.value = JSON.stringify(p);
-      opt.textContent = `${p.nombre} - $${p.precio}`;
+      opt.value = JSON.stringify(productoNormalizado);
+      opt.textContent = `${productoNormalizado.nombre} - $${productoNormalizado.precio}`;
       selectProductos.appendChild(opt);
     });
 
