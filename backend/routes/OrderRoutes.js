@@ -110,8 +110,8 @@ router.get("/por-fecha/:fecha", async (req, res) => {
     const fecha = req.params.fecha;
     const { inicio, fin } = rangoFechaColombia(fecha);
 
-    const ordenes = await Order.find({
-      createdAt: { $gte: fechaInicio, $lte: fechaFin }
+      const ordenes = await Order.find({
+      createdAt: { $gte: inicio, $lt: fin }
     }).sort({ createdAt: 1 });
 
     res.json(ordenes);
