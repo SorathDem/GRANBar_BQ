@@ -109,6 +109,17 @@ function renderOrdenes(ordenes) {
   });
 
   totalDiaDiv.textContent = `Total del día: $${total.toLocaleString()}`;
+  const totalesMetodo = calcularTotalesPorMetodo(ordenes);
+  const divMetodo = document.getElementById("totalesMetodoPago");
+
+  divMetodo.innerHTML = `
+    <strong>Totales por método de pago:</strong><br>
+    💵 Efectivo: $${totalesMetodo.efectivo.toLocaleString("es-CO")}<br>
+    💳 Tarjeta: $${totalesMetodo.tarjeta.toLocaleString("es-CO")}<br>
+    🔁 Transferencia: $${totalesMetodo.transferencia.toLocaleString("es-CO")}<br>
+    📱 Nequi: $${totalesMetodo.nequi.toLocaleString("es-CO")}<br>
+    📱 Daviplata: $${totalesMetodo.daviplata.toLocaleString("es-CO")}
+  `;
 }
 
 
@@ -261,6 +272,25 @@ function renderProductos() {
     div.append(inputNombre, inputCantidad, inputPrecio, inputRec, btnEliminar);
     contenedorProductos.appendChild(div);
   });
+}
+
+function calcularTotalesPorMetodo(ordenes) {
+  const totales = {
+    efectivo: 0,
+    tarjeta: 0,
+    transferencia: 0,
+    nequi: 0,
+    daviplata: 0
+  };
+
+  ordenes.forEach(o => {
+    const metodo = (o.metodoPago || "efectivo").toLowerCase();
+    if (totales[metodo] !== undefined) {
+      totales[metodo] += Number(o.total || 0);
+    }
+  });
+
+  return totales;
 }
 
 function calcularTotal() {

@@ -161,7 +161,7 @@ router.get("/reporte/mensual", async (req, res) => {
       if (o.fecha !== fechaActual) {
         fechaActual = o.fecha;
         doc.moveDown();
-        doc.fontSize(13).text(`📅 Fecha: ${fechaActual}`);
+        doc.fontSize(13).text(`Fecha: ${fechaActual}`);
         y = doc.y + 10;
         encabezadoTabla(doc, y);
         y += 25;
