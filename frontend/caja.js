@@ -65,7 +65,7 @@ function renderOrdenes(ordenes) {
 
     // === BOTONES ===
     const btnEditar = document.createElement("button");
-    btnEditar.textContent = "Editar";
+    btnEditar.textContent = "Pagar";
     btnEditar.style.marginRight = "6px";
     btnEditar.addEventListener("click", () => abrirModalEdicion(orden));
 
