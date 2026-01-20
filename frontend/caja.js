@@ -59,9 +59,11 @@ function renderOrdenes(ordenes) {
       .map((p) => `${p.nombre} (${p.cantidad})${p.recomendaciones ? " — " + p.recomendaciones : ""}`)
       .join("<br>");
 
-    const fechaLocal = new Date(orden.createdAt).toLocaleDateString("es-CO", {
-      timeZone: "America/Bogota",
-    });
+    function formatearFecha(fecha) {
+      const [y, m, d] = fecha.split("-");
+      return `${d}/${m}/${y}`;
+    }
+    const fechaLocal = formatearFecha(orden.fecha);
 
     // === BOTONES ===
     const btnEditar = document.createElement("button");
