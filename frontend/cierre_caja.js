@@ -26,9 +26,13 @@ async function cargarCierres() {
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
-    const fechaFormateada = fechaStr
-      ? fechaStr.split("-").reverse().join("/")
-      : "Sin fecha";
+    const fechaFormateada = new Date(caja.fecha)
+    .toLocaleDateString("es-CO", {
+      timeZone: "UTC",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
 
       // 🔗 Botón para ver órdenes del día
       const botonVer = document.createElement("button");
