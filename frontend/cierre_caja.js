@@ -22,20 +22,20 @@ async function cargarCierres() {
     data.forEach(caja => {
       const fila = document.createElement("tr");
 
-      const fechaCaja = caja.fecha ? new Date(caja.fecha) : null;
+      const fechaCaja = caja.fecha;
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
-      const fechaFormateada = fechaCaja
-        ? fechaCaja.toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
-        : "Sin fecha";
+    const fechaFormateada = fechaStr
+      ? fechaStr.split("-").reverse().join("/")
+      : "Sin fecha";
 
       // 🔗 Botón para ver órdenes del día
       const botonVer = document.createElement("button");
       botonVer.textContent = "Ver órdenes";
       botonVer.addEventListener("click", () => {
         if (fechaCaja) {
-          const fechaISO = fechaCaja.toISOString().split("T")[0]; // formato YYYY-MM-DD
+          const fechaISO = fechaStr; // formato YYYY-MM-DD
           window.location.href = `./caja.html?fecha=${fechaISO}`;
         } else {
           alert("Fecha inválida para este cierre.");

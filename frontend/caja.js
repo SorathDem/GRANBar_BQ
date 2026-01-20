@@ -284,46 +284,27 @@ function abrirModalEdicion(orden) {
   modalEditar.style.display = "flex";
 }
 
-function sumarUnDia(fechaYYYYMMDD) {
-  const fecha = new Date(fechaYYYYMMDD + "T00:00:00");
-  fecha.setDate(fecha.getDate() + 1);
-  return fecha.toISOString().split("T")[0];
-}
-
 
 // Cerrar caja
 cerrarCajaBtn.addEventListener("click", async () => {
   const fechaSeleccionada = fechaInput.value;
-  if (!fechaSeleccionada) {
-    alert("Selecciona una fecha antes de cerrar la caja.");
-    return;
-  }
-
-  const fechaCierre = sumarUnDia(fechaSeleccionada);
-
-  const confirmacion = confirm(
-    `¿Seguro que deseas cerrar la caja del día ${fechaCierre}?`
-  );
+  if (!fechaSeleccionada) return alert("Selecciona una fecha antes de cerrar la caja.");
+  const confirmacion = confirm(`¿Seguro que deseas cerrar la caja del día ${fechaSeleccionada}?`);
   if (!confirmacion) return;
-
   try {
     const response = await fetch(`${API_BASE}/cerrar-caja`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fecha: fechaCierre }),
+      body: JSON.stringify({ fecha: fechaSeleccionada }),
     });
-
     if (!response.ok) throw new Error(await response.text());
-
     const data = await response.json();
     alert(`Caja cerrada.\nTotal del día: $${data.caja.totalDia.toLocaleString()}`);
-
   } catch (error) {
     console.error("Error cerrando caja:", error);
     alert("Error al cerrar la caja.");
   }
 });
-
 
 cancelarEdicionBtn.addEventListener("click", () => {
   modalEditar.style.display = "none";
