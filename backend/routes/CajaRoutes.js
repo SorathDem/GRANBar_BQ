@@ -1,5 +1,7 @@
 import express from "express";
 import Caja from "../models/caja.js";
+import PDFDocument from "pdfkit";
+import Order from "../models/Order.js";
 
 const router = express.Router();
 

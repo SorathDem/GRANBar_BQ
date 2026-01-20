@@ -20,7 +20,6 @@ async function cargarCierres() {
     if (!res.ok) throw new Error("Error al obtener cierres de caja");
 
     const data = await res.json();
-
     tbody.innerHTML = "";
 
     if (!Array.isArray(data) || data.length === 0) {
@@ -59,19 +58,36 @@ async function cargarCierres() {
       botonReporte.style.marginLeft = "6px";
 
       botonReporte.addEventListener("click", () => {
-        const opcion = prompt(
-          "Escriba:\n'd' → reporte diario\n'm' → reporte mensual"
+        const tipo = prompt(
+          "Seleccione el tipo de reporte:\n" +
+          "d → Diario\n" +
+          "m → Mensual"
         );
 
-        if (opcion === "d") {
+        // 📅 REPORTE DIARIO
+        if (tipo === "d") {
+          const fecha = prompt("Ingrese la fecha (YYYY-MM-DD)");
+          if (!fecha) {
+            alert("Fecha inválida");
+            return;
+          }
+
           window.open(
-            `${API_CAJAS}/reporte/diario?fecha=${fechaISO}`,
+            `${API_CAJAS}/reporte/diario?fecha=${fecha}`,
             "_blank"
           );
         }
 
-        if (opcion === "m") {
-          const [year, month] = fechaISO.split("-");
+        // 📆 REPORTE MENSUAL
+        if (tipo === "m") {
+          const year = prompt("Ingrese el año (YYYY)");
+          const month = prompt("Ingrese el mes (01-12)");
+
+          if (!year || !month) {
+            alert("Año o mes inválido");
+            return;
+          }
+
           window.open(
             `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
             "_blank"
