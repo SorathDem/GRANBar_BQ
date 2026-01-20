@@ -61,6 +61,17 @@ router.post("/", async (req, res) => {
   }
 });
 
+function rangoFechaColombia(fechaYYYYMMDD) {
+  const inicio = new Date(
+    new Date(`${fechaYYYYMMDD}T00:00:00`)
+      .toLocaleString("en-US", { timeZone: "America/Bogota" })
+  );
+
+  const fin = new Date(inicio);
+  fin.setDate(fin.getDate() + 1);
+
+  return { inicio, fin };
+}
 // IMPRIMIR FACTURA (cambiar estado a pending_ticket)
 // RUTA PARA IMPRIMIR FACTURA (SOLO CAMBIA EL STATUS)
 router.patch("/:id/imprimir-factura", async (req, res) => {
@@ -97,8 +108,7 @@ router.patch("/:id/imprimir-factura", async (req, res) => {
 router.get("/por-fecha/:fecha", async (req, res) => {
   try {
     const fecha = req.params.fecha;
-    const fechaInicio = new Date(`${fecha}T00:00:00.000Z`);
-    const fechaFin = new Date(`${fecha}T23:59:59.999Z`);
+    const { inicio, fin } = rangoFechaColombia(fecha);
 
     const ordenes = await Order.find({
       createdAt: { $gte: fechaInicio, $lte: fechaFin }
@@ -136,9 +146,7 @@ router.post("/cerrar-caja", async (req, res) => {
       return res.status(400).json({ error: "Falta la fecha" });
     }
 
-    const inicio = new Date(fecha);
-    const fin = new Date(fecha);
-    fin.setDate(inicio.getDate() + 1);
+    const { inicio, fin } = rangoFechaColombia(fecha);
 
     const ordenes = await Order.find({
       createdAt: { $gte: inicio, $lt: fin }
@@ -152,7 +160,7 @@ router.post("/cerrar-caja", async (req, res) => {
 
     // Guarda un registro de caja
     const caja = new Caja({
-      fecha: inicio,
+      fecha,
       totalDia,
       cantidadOrdenes: ordenes.length
     });
