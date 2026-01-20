@@ -6,7 +6,6 @@ const mensaje = document.getElementById("mensaje");
 function formatearFecha(fecha) {
   if (!fecha) return "";
 
-  // Si viene como Date ISO (2026-01-19T00:00:00.000Z)
   if (fecha.includes("T")) {
     fecha = fecha.split("T")[0];
   }
@@ -14,33 +13,6 @@ function formatearFecha(fecha) {
   const [y, m, d] = fecha.split("-");
   return `${d}/${m}/${y}`;
 }
-
-const botonReporte = document.createElement("button");
-botonReporte.textContent = "Generar reporte";
-
-botonReporte.addEventListener("click", () => {
-  const fechaISO = caja.fecha.split("T")[0];
-
-  const opcion = prompt(
-    "Escriba:\n- 'd' para reporte diario\n- 'm' para reporte mensual"
-  );
-
-  if (opcion === "d") {
-    window.open(
-      `${API_CAJAS}/reporte/diario?fecha=${fechaISO}`,
-      "_blank"
-    );
-  }
-
-  if (opcion === "m") {
-    const [year, month] = fechaISO.split("-");
-    window.open(
-      `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
-      "_blank"
-    );
-  }
-});
-
 
 async function cargarCierres() {
   try {
@@ -60,16 +32,51 @@ async function cargarCierres() {
 
     data.forEach(caja => {
       const fila = document.createElement("tr");
+
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
-      const fechaFormateada = formatearFecha(caja.fecha);
+      const fechaISO = caja.fecha.includes("T")
+        ? caja.fecha.split("T")[0]
+        : caja.fecha;
 
-      // 🔗 Botón para ver órdenes del día
+      const fechaFormateada = formatearFecha(fechaISO);
+
+      /* =====================
+         BOTÓN VER ÓRDENES
+      ===================== */
       const botonVer = document.createElement("button");
       botonVer.textContent = "Ver órdenes";
       botonVer.addEventListener("click", () => {
-        window.location.href = `./caja.html?fecha=${caja.fecha.split("T")[0]}`;
+        window.location.href = `./caja.html?fecha=${fechaISO}`;
+      });
+
+      /* =====================
+         BOTÓN GENERAR REPORTE
+      ===================== */
+      const botonReporte = document.createElement("button");
+      botonReporte.textContent = "Generar reporte";
+      botonReporte.style.marginLeft = "6px";
+
+      botonReporte.addEventListener("click", () => {
+        const opcion = prompt(
+          "Escriba:\n'd' → reporte diario\n'm' → reporte mensual"
+        );
+
+        if (opcion === "d") {
+          window.open(
+            `${API_CAJAS}/reporte/diario?fecha=${fechaISO}`,
+            "_blank"
+          );
+        }
+
+        if (opcion === "m") {
+          const [year, month] = fechaISO.split("-");
+          window.open(
+            `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
+            "_blank"
+          );
+        }
       });
 
       fila.innerHTML = `
@@ -78,11 +85,11 @@ async function cargarCierres() {
         <td>${cantidadOrdenes}</td>
       `;
 
-      const celdaBoton = document.createElement("td");
-      celdaBoton.appendChild(botonVer);
-      celdaBoton.appendChild(botonReporte);
-      fila.appendChild(celdaBoton);
+      const celdaBotones = document.createElement("td");
+      celdaBotones.appendChild(botonVer);
+      celdaBotones.appendChild(botonReporte);
 
+      fila.appendChild(celdaBotones);
       tbody.appendChild(fila);
     });
   } catch (error) {
