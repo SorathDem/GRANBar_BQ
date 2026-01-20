@@ -22,7 +22,7 @@ async function cargarCierres() {
     data.forEach(caja => {
       const fila = document.createElement("tr");
 
-      const fechaCaja = caja.fecha;
+      const fechaStr = caja.fecha;
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
