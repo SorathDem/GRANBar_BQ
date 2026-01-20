@@ -15,6 +15,32 @@ function formatearFecha(fecha) {
   return `${d}/${m}/${y}`;
 }
 
+const botonReporte = document.createElement("button");
+botonReporte.textContent = "Generar reporte";
+
+botonReporte.addEventListener("click", () => {
+  const fechaISO = caja.fecha.split("T")[0];
+
+  const opcion = prompt(
+    "Escriba:\n- 'd' para reporte diario\n- 'm' para reporte mensual"
+  );
+
+  if (opcion === "d") {
+    window.open(
+      `${API_CAJAS}/reporte/diario?fecha=${fechaISO}`,
+      "_blank"
+    );
+  }
+
+  if (opcion === "m") {
+    const [year, month] = fechaISO.split("-");
+    window.open(
+      `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
+      "_blank"
+    );
+  }
+});
+
 
 async function cargarCierres() {
   try {
@@ -54,6 +80,7 @@ async function cargarCierres() {
 
       const celdaBoton = document.createElement("td");
       celdaBoton.appendChild(botonVer);
+      celdaBoton.appendChild(botonReporte);
       fila.appendChild(celdaBoton);
 
       tbody.appendChild(fila);
