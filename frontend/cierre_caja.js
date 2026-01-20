@@ -3,6 +3,11 @@ const API_CAJAS = "https://granbar-bq.onrender.com/api/cajas";
 const tbody = document.getElementById("tbodyCierres");
 const mensaje = document.getElementById("mensaje");
 
+function formatearFecha(fechaYYYYMMDD) {
+  const [y, m, d] = fechaYYYYMMDD.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 async function cargarCierres() {
   try {
     const res = await fetch(API_CAJAS);
@@ -26,24 +31,13 @@ async function cargarCierres() {
       const totalDia = caja.totalDia || 0;
       const cantidadOrdenes = caja.cantidadOrdenes || 0;
 
-    const fechaFormateada = new Date(caja.fecha)
-    .toLocaleDateString("es-CO", {
-      timeZone: "UTC",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    });
+    const fechaFormateada = formatearFecha(fechaStr);
 
       // 🔗 Botón para ver órdenes del día
       const botonVer = document.createElement("button");
       botonVer.textContent = "Ver órdenes";
       botonVer.addEventListener("click", () => {
-        if (fechaCaja) {
-          const fechaISO = fechaStr; // formato YYYY-MM-DD
-          window.location.href = `./caja.html?fecha=${fechaISO}`;
-        } else {
-          alert("Fecha inválida para este cierre.");
-        }
+        window.location.href = `./caja.html?fecha=${fechaStr}`;
       });
 
       fila.innerHTML = `
