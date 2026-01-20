@@ -24,16 +24,14 @@ router.get("/reporte/diario", async (req, res) => {
     const { fecha } = req.query;
 
     if (!fecha) {
-      return res.status(400).json({ error: "Fecha requerida" });
+      return res.status(400).json({ error: "Fecha requerida (YYYY-MM-DD)" });
     }
 
-    // 👉 FECHA EN FORMATO YYYY-MM-DD
-    const inicio = new Date(`${fecha}T00:00:00-05:00`);
-    const fin = new Date(`${fecha}T23:59:59-05:00`);
+    const ordenes = await Order.find({ fecha }).sort({ createdAt: 1 });
 
-    const ordenes = await Order.find({
-      createdAt: { $gte: inicio, $lte: fin }
-    });
+    if (ordenes.length === 0) {
+      return res.status(404).json({ error: "No hay órdenes para esa fecha" });
+    }
 
     const doc = new PDFDocument({ margin: 40 });
 
@@ -79,12 +77,16 @@ router.get("/reporte/mensual", async (req, res) => {
       return res.status(400).json({ error: "Año y mes requeridos" });
     }
 
-    const inicio = new Date(`${year}-${month}-01T00:00:00-05:00`);
-    const fin = new Date(year, Number(month), 0, 23, 59, 59);
+    // ÓRDENES YA TIENEN fecha YYYY-MM-DD
+    const regex = new RegExp(`^${year}-${month}`);
 
     const ordenes = await Order.find({
-      createdAt: { $gte: inicio, $lte: fin }
-    });
+      fecha: { $regex: regex }
+    }).sort({ fecha: 1 });
+
+    if (ordenes.length === 0) {
+      return res.status(404).json({ error: "No hay órdenes para ese mes" });
+    }
 
     const doc = new PDFDocument({ margin: 40 });
 
@@ -105,9 +107,8 @@ router.get("/reporte/mensual", async (req, res) => {
     let totalGeneral = 0;
 
     ordenes.forEach(o => {
-      const fecha = o.createdAt.toISOString().split("T")[0];
       doc.fontSize(12).text(
-        `${fecha} - Mesa ${o.mesa} - $${o.total.toLocaleString("es-CO")}`
+        `${o.fecha} - Mesa ${o.mesa} - $${o.total.toLocaleString("es-CO")}`
       );
       totalGeneral += o.total;
     });
@@ -122,7 +123,7 @@ router.get("/reporte/mensual", async (req, res) => {
   } catch (error) {
     console.error("❌ Error reporte mensual:", error);
     res.status(500).json({ error: "Error generando reporte mensual" });
-  } 
+  }
 });
 
 export default router;
