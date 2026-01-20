@@ -4,9 +4,11 @@ const tbody = document.getElementById("tbodyCierres");
 const mensaje = document.getElementById("mensaje");
 
 function formatearFecha(fechaYYYYMMDD) {
+ if (!fechaYYYYMMDD) return "";
   const [y, m, d] = fechaYYYYMMDD.split("-");
   return `${d}/${m}/${y}`;
 }
+
 
 async function cargarCierres() {
   try {
