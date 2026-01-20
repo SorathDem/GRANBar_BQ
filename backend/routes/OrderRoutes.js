@@ -2,6 +2,8 @@
 import express from "express";
 import Order from "../models/Order.js";
 import Caja from "../models/caja.js";
+import descontarStockYDetectarBajo  from "../services/stockService.js";
+
 
 const router = express.Router();
 
@@ -45,9 +47,12 @@ router.post("/", async (req, res) => {
 
     await nuevaOrden.save();
 
+    const alertasStockBajo = await descontarStockYDetectarBajo(itemsProcesados);
+
     res.status(201).json({
       mensaje: "Orden creada con éxito",
-      orden: nuevaOrden
+      orden: nuevaOrden,
+      alertasStockBajo
     });
 
   } catch (err) {
