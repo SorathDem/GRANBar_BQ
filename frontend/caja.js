@@ -12,6 +12,7 @@ const modalEditar = document.getElementById("modalEditar");
 const editMesa = document.getElementById("editMesa");
 const editTotal = document.getElementById("editTotal");
 const editFecha = document.getElementById("editFecha");
+const editMetodoPago = document.getElementById("editMetodoPago");
 const guardarCambiosBtn = document.getElementById("guardarCambios");
 const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 
@@ -94,6 +95,7 @@ function renderOrdenes(ordenes) {
 
     fila.innerHTML = `
       <td>${orden.mesa || "N/A"}</td>
+      <td>${orden.metodoPago || "efectivo"}</td>
       <td style="text-align:left;">${productos}</td>
       <td>$${Number(orden.total).toLocaleString()}</td>
       <td>${fechaLocal}</td>
@@ -273,6 +275,7 @@ function abrirModalEdicion(orden) {
 
   editMesa.value = orden.mesa || "";
   editFecha.value = orden.fecha ? orden.fecha.split("T")[0] : "";
+  editMetodoPago.value = orden.metodoPago || "efectivo";
 
   cargarCatalogo();
   renderProductos();
@@ -312,6 +315,7 @@ guardarCambiosBtn.addEventListener("click", async () => {
     const datos = {
       mesa: editMesa.value,
       fecha: editFecha.value,
+      metodoPago: editMetodoPago.value,
       items: itemsEditando,
       total: Number(editTotal.value)
     };

@@ -14,6 +14,11 @@ const OrderSchema = new mongoose.Schema({
   mesa: { type: String, default: "No especificada" },
   items: [ItemSchema],
   total: { type: Number, default: 0 },
+  metodoPago: {
+  type: String,
+  enum: ["efectivo", "tarjeta", "transferencia", "nequi", "daviplata"],
+  default: "efectivo"
+},
   status: {
     type: String,
     enum: ["pending_print", "printing", "printed", "completed", "error"],

@@ -94,6 +94,7 @@
     <thead>
       <tr>
         <th>Mesa</th>
+        <th>Metodo Pago</th>
         <th>Productos y Recomendaciones</th>
         <th>Total</th>
         <th>Fecha</th>
@@ -113,6 +114,14 @@
       <input type="number" id="editTotal" class="input-edit" style="width:100%; margin-bottom:10px;">
       <label>Fecha:</label>
       <input type="date" id="editFecha" class="input-edit" style="width:100%; margin-bottom:10px;">
+      <label for="editMetodoPago">Método de pago</label>
+      <select id="editMetodoPago">
+        <option value="efectivo">Efectivo</option>
+        <option value="tarjeta">Tarjeta</option>
+        <option value="transferencia">Transferencia</option>
+        <option value="nequi">Nequi</option>
+        <option value="daviplata">Daviplata</option>
+      </select>
       <h4 style="margin-top:15px;">🛒 Productos</h4>
       <div id="catalogoContainer">
         <select id="selectProductos"></select>
