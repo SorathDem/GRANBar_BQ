@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
       items: itemsProcesados,
       total,
       status: "pending_print",  // ← para que el worker la imprima inmediatamente
-      createdAt: new Date()
+      fecha: fechaColombia
     });
 
     await nuevaOrden.save();
@@ -59,6 +59,10 @@ router.post("/", async (req, res) => {
     console.error("Error creando orden:", err);
     res.status(500).json({ error: "Error interno del servidor" });
   }
+});
+
+const fechaColombia = new Date().toLocaleDateString("en-CA", {
+  timeZone: "America/Bogota"
 });
 
 function rangoFechaColombia(fechaYYYYMMDD) {
@@ -108,11 +112,7 @@ router.patch("/:id/imprimir-factura", async (req, res) => {
 router.get("/por-fecha/:fecha", async (req, res) => {
   try {
     const fecha = req.params.fecha;
-    const { inicio, fin } = rangoFechaColombia(fecha);
-
-      const ordenes = await Order.find({
-      createdAt: { $gte: inicio, $lt: fin }
-    }).sort({ createdAt: 1 });
+    const ordenes = await Order.find({ fecha }).sort({ createdAt: 1 });
 
     res.json(ordenes);
   } catch (err) {
@@ -146,11 +146,8 @@ router.post("/cerrar-caja", async (req, res) => {
       return res.status(400).json({ error: "Falta la fecha" });
     }
 
+    const ordenes = await Order.find({ fecha });
     const { inicio, fin } = rangoFechaColombia(fecha);
-
-    const ordenes = await Order.find({
-      createdAt: { $gte: inicio, $lt: fin }
-    });
 
     if (ordenes.length === 0) {
       return res.status(404).json({ error: "No hay órdenes para esa fecha" });
