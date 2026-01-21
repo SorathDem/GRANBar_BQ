@@ -14,56 +14,49 @@ function formatearFecha(fecha) {
   return `${d}/${m}/${y}`;
 }
 
-const botonGenerar = document.getElementById("btnGenerarReporte");
-const diarioDiv = document.getElementById("reporteDiario");
-const mensualDiv = document.getElementById("reporteMensual");
+const modal = document.getElementById("modalReporte");
+const abrir = document.getElementById("abrirReporte");
+const cerrar = document.getElementById("cerrarReporte");
+
+const diarioBox = document.getElementById("diarioBox");
+const mensualBox = document.getElementById("mensualBox");
+
+abrir.addEventListener("click", () => {
+  modal.style.display = "flex";
+});
+
+cerrar.addEventListener("click", () => {
+  modal.style.display = "none";
+});
 
 document.querySelectorAll("input[name='tipoReporte']").forEach(radio => {
   radio.addEventListener("change", () => {
-    if (radio.value === "diario" && radio.checked) {
-      diarioDiv.style.display = "block";
-      mensualDiv.style.display = "none";
-    }
-    if (radio.value === "mensual" && radio.checked) {
-      diarioDiv.style.display = "none";
-      mensualDiv.style.display = "block";
-    }
+    diarioBox.style.display = radio.value === "diario" && radio.checked ? "block" : "none";
+    mensualBox.style.display = radio.value === "mensual" && radio.checked ? "block" : "none";
   });
 });
 
-botonGenerar.addEventListener("click", () => {
+document.getElementById("generarReporte").addEventListener("click", () => {
   const tipo = document.querySelector("input[name='tipoReporte']:checked").value;
 
-  // 📅 REPORTE DIARIO
   if (tipo === "diario") {
     const fecha = document.getElementById("fechaDiaria").value;
-    if (!fecha) {
-      alert("Seleccione una fecha");
-      return;
-    }
+    if (!fecha) return alert("Seleccione una fecha");
 
-    window.open(
-      `${API_CAJAS}/reporte/diario?fecha=${fecha}`,
-      "_blank"
-    );
+    window.open(`${API_CAJAS}/reporte/diario?fecha=${fecha}`, "_blank");
   }
 
-  // 📆 REPORTE MENSUAL
   if (tipo === "mensual") {
-    const monthInput = document.getElementById("monthMensual").value;
-    if (!monthInput) {
-      alert("Seleccione mes y año");
-      return;
-    }
+    const fecha = document.getElementById("fechaMensual").value;
+    if (!fecha) return alert("Seleccione mes y año");
 
-    const [year, month] = monthInput.split("-");
-
-    window.open(
-      `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
-      "_blank"
-    );
+    const [year, month] = fecha.split("-");
+    window.open(`${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`, "_blank");
   }
+
+  modal.style.display = "none";
 });
+
 
 
 async function cargarCierres() {
