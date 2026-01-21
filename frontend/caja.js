@@ -29,12 +29,12 @@ const nfMesa = document.getElementById("addMesa");
 const nfMetodoPago = document.getElementById("addMetodoPago");
 const nfFecha = document.getElementById("addFecha");
 
-const nfSelectProductos = document.getElementById("selectProductos");
-const nfProductosContainer = document.getElementById("productosEditarContainer");
-const nfTotal = document.getElementById("editTotal");
+const nfSelectProductos = document.getElementById("addSelectProductos");
+const nfProductosContainer = document.getElementById("addProductosContainer");
+const nfTotal = document.getElementById("addTotal");
 
 const nfBtnNuevaFactura = document.getElementById("btnNuevaFactura");
-const nfBtnAgregarProducto = document.getElementById("btnAgregarCatalogo");
+const nfBtnAgregarProducto = document.getElementById("addBtnAgregarProducto");
 const nfBtnGuardar = document.getElementById("btnGuardarNuevaFactura");
 const nfBtnCancelar = document.getElementById("btnCancelarNuevaFactura");
 
