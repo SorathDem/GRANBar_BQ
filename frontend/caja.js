@@ -18,23 +18,27 @@ const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 
 let ordenEditando = null;
 
-//NUEVA FACTURA 
-const modalNuevaFactura = document.getElementById("modalNuevaFactura");
+// ================================
+// MODAL NUEVA FACTURA (AISLADO)
+// ================================
 
-const addMesa = document.getElementById("addMesa");
-const addMetodoPago = document.getElementById("addMetodoPago");
-const addFecha = document.getElementById("addFecha");
+const nfModal = document.getElementById("modalNuevaFactura");
 
-const addSelectProductos = document.getElementById("selectProductos");
-const addProductosContainer = document.getElementById("productosEditarContainer");
-const addTotal = document.getElementById("editTotal");
+const nfMesa = document.getElementById("addMesa");
+const nfMetodoPago = document.getElementById("addMetodoPago");
+const nfFecha = document.getElementById("addFecha");
 
-const btnNuevaFactura = document.getElementById("btnNuevaFactura");
-const btnAgregarProductoFactura = document.getElementById("btnAgregarCatalogo");
-const btnGuardarNuevaFactura = document.getElementById("btnGuardarNuevaFactura");
-const btnCancelarNuevaFactura = document.getElementById("btnCancelarNuevaFactura");
+const nfSelectProductos = document.getElementById("selectProductos");
+const nfProductosContainer = document.getElementById("productosEditarContainer");
+const nfTotal = document.getElementById("editTotal");
 
-let itemsNuevaFactura = [];
+const nfBtnNuevaFactura = document.getElementById("btnNuevaFactura");
+const nfBtnAgregarProducto = document.getElementById("btnAgregarCatalogo");
+const nfBtnGuardar = document.getElementById("btnGuardarNuevaFactura");
+const nfBtnCancelar = document.getElementById("btnCancelarNuevaFactura");
+
+let nfItems = [];
+
 
 
 
@@ -402,21 +406,20 @@ async function eliminarOrden(id) {
 
 //AGREGAR FACTURA 
 
-async function cargarCatalogoNuevaFactura() {
+async function nfCargarCatalogo() {
   try {
     const res = await fetch(API_URL);
-
     if (!res.ok) throw new Error("Error cargando catálogo");
 
     const data = await res.json();
     const productos = Array.isArray(data) ? data : data.productos || [];
 
-    addSelectProductos.innerHTML = "";
+    nfSelectProductos.innerHTML = "";
 
     if (productos.length === 0) {
       const opt = document.createElement("option");
       opt.textContent = "No hay productos";
-      addSelectProductos.appendChild(opt);
+      nfSelectProductos.appendChild(opt);
       return;
     }
 
@@ -429,46 +432,48 @@ async function cargarCatalogoNuevaFactura() {
       const opt = document.createElement("option");
       opt.value = JSON.stringify(producto);
       opt.textContent = `${producto.nombre} - $${producto.precio}`;
-      addSelectProductos.appendChild(opt);
+      nfSelectProductos.appendChild(opt);
     });
 
-  } catch (error) {
-    console.error("❌ Error catálogo nueva factura:", error);
+  } catch (err) {
+    console.error("❌ Error catálogo nueva factura:", err);
   }
 }
 
 
-btnNuevaFactura.addEventListener("click", () => {
+
+nfBtnNuevaFactura.addEventListener("click", () => {
   if (!fechaInput.value) {
     return alert("Selecciona una fecha primero");
   }
 
-  itemsNuevaFactura = [];
+  nfItems = [];
 
-  addMesa.value = "";
-  addMetodoPago.value = "efectivo";
-  addFecha.value = fechaInput.value;
-  addTotal.value = 0;
+  nfMesa.value = "";
+  nfMetodoPago.value = "efectivo";
+  nfFecha.value = fechaInput.value;
+  nfTotal.value = 0;
 
-  addProductosContainer.innerHTML = "";
+  nfProductosContainer.innerHTML = "";
 
-  cargarCatalogoNuevaFactura();
-  renderProductosNuevaFactura();
+  nfCargarCatalogo();
+  nfRenderProductos();
 
-  modalNuevaFactura.style.display = "flex";
+  nfModal.style.display = "flex";
 });
 
-btnAgregarProductoFactura.addEventListener("click", () => {
-  if (!addSelectProductos.value) return;
 
-  const producto = JSON.parse(addSelectProductos.value);
+nfBtnAgregarProducto.addEventListener("click", () => {
+  if (!nfSelectProductos.value) return;
 
-  const existente = itemsNuevaFactura.find(p => p.nombre === producto.nombre);
+  const producto = JSON.parse(nfSelectProductos.value);
+
+  const existente = nfItems.find(p => p.nombre === producto.nombre);
 
   if (existente) {
     existente.cantidad++;
   } else {
-    itemsNuevaFactura.push({
+    nfItems.push({
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: 1,
@@ -476,83 +481,80 @@ btnAgregarProductoFactura.addEventListener("click", () => {
     });
   }
 
-  renderProductosNuevaFactura();
-  calcularTotalNuevaFactura();
+  nfRenderProductos();
+  nfCalcularTotal();
 });
 
-function renderProductosNuevaFactura() {
-  addProductosContainer.innerHTML = "";
+function nfRenderProductos() {
+  nfProductosContainer.innerHTML = "";
 
-  itemsNuevaFactura.forEach((item, index) => {
+  nfItems.forEach((item, index) => {
     const div = document.createElement("div");
     div.style.border = "1px solid #ccc";
     div.style.padding = "8px";
     div.style.marginBottom = "6px";
 
-    const inputNombre = document.createElement("input");
-    inputNombre.value = item.nombre;
-    inputNombre.addEventListener("input", e => {
-      itemsNuevaFactura[index].nombre = e.target.value;
-    });
+    const nombre = document.createElement("input");
+    nombre.value = item.nombre;
+    nombre.oninput = e => nfItems[index].nombre = e.target.value;
 
-    const inputCantidad = document.createElement("input");
-    inputCantidad.type = "number";
-    inputCantidad.min = 1;
-    inputCantidad.value = item.cantidad;
-    inputCantidad.addEventListener("input", e => {
-      itemsNuevaFactura[index].cantidad = Number(e.target.value);
-      calcularTotalNuevaFactura();
-    });
+    const cantidad = document.createElement("input");
+    cantidad.type = "number";
+    cantidad.min = 1;
+    cantidad.value = item.cantidad;
+    cantidad.oninput = e => {
+      nfItems[index].cantidad = Number(e.target.value);
+      nfCalcularTotal();
+    };
 
-    const inputPrecio = document.createElement("input");
-    inputPrecio.type = "number";
-    inputPrecio.min = 0;
-    inputPrecio.value = item.precio;
-    inputPrecio.addEventListener("input", e => {
-      itemsNuevaFactura[index].precio = Number(e.target.value);
-      calcularTotalNuevaFactura();
-    });
+    const precio = document.createElement("input");
+    precio.type = "number";
+    precio.min = 0;
+    precio.value = item.precio;
+    precio.oninput = e => {
+      nfItems[index].precio = Number(e.target.value);
+      nfCalcularTotal();
+    };
 
-    const inputRec = document.createElement("input");
-    inputRec.placeholder = "Recomendaciones";
-    inputRec.value = item.recomendaciones || "";
-    inputRec.addEventListener("input", e => {
-      itemsNuevaFactura[index].recomendaciones = e.target.value;
-    });
+    const rec = document.createElement("input");
+    rec.placeholder = "Recomendaciones";
+    rec.value = item.recomendaciones || "";
+    rec.oninput = e => nfItems[index].recomendaciones = e.target.value;
 
     const btnEliminar = document.createElement("button");
     btnEliminar.textContent = "🗑";
-    btnEliminar.addEventListener("click", () => {
-      itemsNuevaFactura.splice(index, 1);
-      renderProductosNuevaFactura();
-      calcularTotalNuevaFactura();
-    });
+    btnEliminar.onclick = () => {
+      nfItems.splice(index, 1);
+      nfRenderProductos();
+      nfCalcularTotal();
+    };
 
-    div.append(inputNombre, inputCantidad, inputPrecio, inputRec, btnEliminar);
-    addProductosContainer.appendChild(div);
+    div.append(nombre, cantidad, precio, rec, btnEliminar);
+    nfProductosContainer.appendChild(div);
   });
 }
 
 
-function calcularTotalNuevaFactura() {
-  const total = itemsNuevaFactura.reduce(
+
+function nfCalcularTotal() {
+  nfTotal.value = nfItems.reduce(
     (sum, item) => sum + item.cantidad * item.precio,
     0
   );
-  addTotal.value = total;
 }
 
-btnGuardarNuevaFactura.addEventListener("click", async () => {
-  if (!addMesa.value || itemsNuevaFactura.length === 0) {
+
+nfBtnGuardar.addEventListener("click", async () => {
+  if (!nfMesa.value || nfItems.length === 0) {
     return alert("Faltan datos");
   }
 
   const payload = {
-    mesa: addMesa.value,
-    metodoPago: addMetodoPago.value,
-    fecha: addFecha.value,
-    items: itemsNuevaFactura,
-    total: Number(addTotal.value)
+    mesa: nfMesa.value,
+    metodoPago: nfMetodoPago.value,
+    fecha: nfFecha.value,
+    items: nfItems,
+    total: Number(nfTotal.value)
   };
 
   try {
@@ -564,8 +566,8 @@ btnGuardarNuevaFactura.addEventListener("click", async () => {
 
     if (!res.ok) throw new Error("Error creando factura");
 
-    modalNuevaFactura.style.display = "none";
-    buscarOrdenesPorFecha(addFecha.value);
+    nfModal.style.display = "none";
+    buscarOrdenesPorFecha(nfFecha.value);
 
     alert("✅ Factura creada correctamente");
 
@@ -575,10 +577,12 @@ btnGuardarNuevaFactura.addEventListener("click", async () => {
   }
 });
 
-btnCancelarNuevaFactura.addEventListener("click", () => {
-  modalNuevaFactura.style.display = "none";
-  itemsNuevaFactura = [];
+
+nfBtnCancelar.addEventListener("click", () => {
+  nfModal.style.display = "none";
+  nfItems = [];
 });
+
 
 
 
