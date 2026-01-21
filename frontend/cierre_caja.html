@@ -123,6 +123,39 @@
       </ul>
     </nav>
   </header>
+  <div id="reporteBox" style="margin-bottom:15px; padding:10px; border:1px solid #ccc; border-radius:6px;">
+  <strong>Generar reporte</strong><br><br>
+
+  <label>
+    <input type="radio" name="tipoReporte" value="diario" checked>
+    Diario
+  </label>
+
+  <label style="margin-left:10px;">
+    <input type="radio" name="tipoReporte" value="mensual">
+    Mensual
+  </label>
+
+  <br><br>
+
+  <!-- Diario -->
+  <div id="reporteDiario">
+    <label>Fecha:</label>
+    <input type="date" id="fechaDiaria">
+  </div>
+
+  <!-- Mensual -->
+  <div id="reporteMensual" style="display:none;">
+    <label>Año:</label>
+    <input type="number" id="yearMensual" min="2020" max="2100" style="width:90px;">
+
+    <label style="margin-left:6px;">Mes:</label>
+    <input type="month" id="monthMensual">
+  </div>
+
+  <br>
+  <button id="btnGenerarReporte">Generar reporte</button>
+</div>
 
   <!-- Contenido principal -->
   <h1>Cierres de Caja</h1>

@@ -14,51 +14,58 @@ function formatearFecha(fecha) {
   return `${d}/${m}/${y}`;
 }
 
-/* =====================
-         BOTÓN GENERAR REPORTE
-      ===================== */
-      const botonReporte = document.createElement("button");
-      botonReporte.textContent = "Generar reporte";
-      botonReporte.style.marginLeft = "6px";
+const botonGenerar = document.getElementById("btnGenerarReporte");
+const diarioDiv = document.getElementById("reporteDiario");
+const mensualDiv = document.getElementById("reporteMensual");
 
-      botonReporte.addEventListener("click", () => {
-        const tipo = prompt(
-          "Seleccione el tipo de reporte:\n" +
-          "d → Diario\n" +
-          "m → Mensual"
-        );
+document.querySelectorAll("input[name='tipoReporte']").forEach(radio => {
+  radio.addEventListener("change", () => {
+    if (radio.value === "diario" && radio.checked) {
+      diarioDiv.style.display = "block";
+      mensualDiv.style.display = "none";
+    }
+    if (radio.value === "mensual" && radio.checked) {
+      diarioDiv.style.display = "none";
+      mensualDiv.style.display = "block";
+    }
+  });
+});
 
-        // 📅 REPORTE DIARIO
-        if (tipo === "d") {
-          const fecha = prompt("Ingrese la fecha (YYYY-MM-DD)");
-          if (!fecha) {
-            alert("Fecha inválida");
-            return;
-          }
+botonGenerar.addEventListener("click", () => {
+  const tipo = document.querySelector("input[name='tipoReporte']:checked").value;
 
-          window.open(
-            `${API_CAJAS}/reporte/diario?fecha=${fecha}`,
-            "_blank"
-          );
-        }
+  // 📅 REPORTE DIARIO
+  if (tipo === "diario") {
+    const fecha = document.getElementById("fechaDiaria").value;
+    if (!fecha) {
+      alert("Seleccione una fecha");
+      return;
+    }
 
-        // 📆 REPORTE MENSUAL
-        if (tipo === "m") {
-          const year = prompt("Ingrese el año (YYYY)");
-          const month = prompt("Ingrese el mes (01-12)");
+    window.open(
+      `${API_CAJAS}/reporte/diario?fecha=${fecha}`,
+      "_blank"
+    );
+  }
 
-          if (!year || !month) {
-            alert("Año o mes inválido");
-            return;
-          }
+  // 📆 REPORTE MENSUAL
+  if (tipo === "mensual") {
+    const monthInput = document.getElementById("monthMensual").value;
+    if (!monthInput) {
+      alert("Seleccione mes y año");
+      return;
+    }
 
-          window.open(
-            `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
-            "_blank"
-          );
-        }
-      });
-      
+    const [year, month] = monthInput.split("-");
+
+    window.open(
+      `${API_CAJAS}/reporte/mensual?year=${year}&month=${month}`,
+      "_blank"
+    );
+  }
+});
+
+
 async function cargarCierres() {
   try {
     const res = await fetch(API_CAJAS);
