@@ -18,6 +18,23 @@ const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 
 let ordenEditando = null;
 
+const btnAgregarFactura = document.getElementById("btnAgregarFactura");
+const modalAgregar = document.getElementById("modalAgregar");
+
+const addMesa = document.getElementById("addMesa");
+const addMetodoPago = document.getElementById("addMetodoPago");
+const addFecha = document.getElementById("addFecha");
+const addSelectProducto = document.getElementById("addSelectProducto");
+const addProductosContainer = document.getElementById("addProductosContainer");
+const addTotal = document.getElementById("addTotal");
+
+const btnAddProducto = document.getElementById("btnAddProducto");
+const btnGuardarFactura = document.getElementById("btnGuardarFactura");
+const btnCancelarFactura = document.getElementById("btnCancelarFactura");
+
+let itemsNuevaFactura = [];
+
+
 // === IMPRIMIR FACTURA (YA ESTÁ BIEN, PERO LA MANTENEMOS) ===
 async function imprimirFactura(orderId) {
   if (!confirm("¿Imprimir factura para esta orden?")) return;
@@ -198,6 +215,119 @@ async function cargarCatalogo() {
     console.error("❌ Error cargando catálogo:", error);
   }
 }
+
+async function cargarCatalogoFactura() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+
+  const productos = Array.isArray(data) ? data : data.productos || [];
+
+  addSelectProducto.innerHTML = "";
+
+  productos.forEach(p => {
+    const prod = {
+      nombre: p.nombre,
+      precio: p.precio
+    };
+
+    const opt = document.createElement("option");
+    opt.value = JSON.stringify(prod);
+    opt.textContent = `${prod.nombre} - $${prod.precio}`;
+    addSelectProducto.appendChild(opt);
+  });
+}
+
+btnAgregarFactura.addEventListener("click", () => {
+  if (!fechaInput.value) {
+    return alert("Selecciona primero una fecha");
+  }
+
+  addFecha.value = fechaInput.value;
+  itemsNuevaFactura = [];
+  addProductosContainer.innerHTML = "";
+  addTotal.value = 0;
+
+  cargarCatalogoFactura();
+  modalAgregar.style.display = "flex";
+});
+
+btnAddProducto.addEventListener("click", () => {
+  const producto = JSON.parse(addSelectProducto.value);
+
+  itemsNuevaFactura.push({
+    nombre: producto.nombre,
+    precio: producto.precio,
+    cantidad: 1,
+    recomendaciones: ""
+  });
+
+  renderProductosNuevaFactura();
+});
+
+function renderProductosNuevaFactura() {
+  addProductosContainer.innerHTML = "";
+  let total = 0;
+
+  itemsNuevaFactura.forEach((item, index) => {
+    total += item.cantidad * item.precio;
+
+    const div = document.createElement("div");
+    div.innerHTML = `
+      ${item.nombre} 
+      <input type="number" min="1" value="${item.cantidad}">
+      <button>🗑</button>
+    `;
+
+    div.querySelector("input").addEventListener("input", e => {
+      item.cantidad = Number(e.target.value);
+      renderProductosNuevaFactura();
+    });
+
+    div.querySelector("button").addEventListener("click", () => {
+      itemsNuevaFactura.splice(index, 1);
+      renderProductosNuevaFactura();
+    });
+
+    addProductosContainer.appendChild(div);
+  });
+
+  addTotal.value = total;
+}
+
+btnGuardarFactura.addEventListener("click", async () => {
+  if (!addMesa.value || itemsNuevaFactura.length === 0) {
+    return alert("Faltan datos");
+  }
+
+  const payload = {
+    mesa: addMesa.value,
+    metodoPago: addMetodoPago.value,
+    fecha: addFecha.value,
+    items: itemsNuevaFactura
+  };
+
+  try {
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Error creando factura");
+
+    modalAgregar.style.display = "none";
+    buscarOrdenesPorFecha(addFecha.value);
+    alert("Factura agregada correctamente");
+
+  } catch (err) {
+    alert("Error al crear factura");
+  }
+});
+
+btnCancelarFactura.addEventListener("click", () => {
+  modalAgregar.style.display = "none";
+});
+
 
 document.getElementById("btnAgregarCatalogo").addEventListener("click", () => {
   if (!selectProductos.value) return;
