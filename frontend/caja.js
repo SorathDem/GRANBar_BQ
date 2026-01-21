@@ -21,7 +21,7 @@ let ordenEditando = null;
 // ================================
 // MODAL NUEVA FACTURA (AISLADO)
 // ================================
-
+/*
 const nfModal = document.getElementById("modalNuevaFactura");
 
 const nfMesa = document.getElementById("addMesa");
@@ -38,7 +38,7 @@ const nfBtnGuardar = document.getElementById("btnGuardarNuevaFactura");
 const nfBtnCancelar = document.getElementById("btnCancelarNuevaFactura");
 
 let nfItems = [];
-
+*/
 
 
 
@@ -405,7 +405,7 @@ async function eliminarOrden(id) {
 }
 
 //AGREGAR FACTURA 
-
+/*
 async function nfCargarCatalogo() {
   try {
     const res = await fetch(API_URL);
@@ -582,7 +582,7 @@ nfBtnCancelar.addEventListener("click", () => {
   nfModal.style.display = "none";
   nfItems = [];
 });
-
+*/
 
 
 
