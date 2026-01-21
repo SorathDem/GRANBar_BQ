@@ -103,7 +103,6 @@ async function cargarCierres() {
 
       const celdaBotones = document.createElement("td");
       celdaBotones.appendChild(botonVer);
-      celdaBotones.appendChild(botonReporte);
 
       fila.appendChild(celdaBotones);
       tbody.appendChild(fila);
