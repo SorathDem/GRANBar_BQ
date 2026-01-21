@@ -90,9 +90,7 @@
     <!--<button id="reporteDiario">📅 Reporte Diario (PDF)</button>
     <button id="reporteMensual">🗓️ Reporte Mensual (PDF)</button>-->
   </div>
-  <button id="btnAgregarFactura" style="margin-bottom:10px;">
-  ➕ Agregar factura
-  </button>
+  <button id="btnNuevaFactura">➕ Nueva factura</button>
 
   <table id="tablaOrdenes">
     <thead>
@@ -109,41 +107,30 @@
   </table>
   <div class="total" id="totalDia"></div>
   <div id="totalesMetodoPago"></div>
-  <div id="modalAgregar" class="modal">
-  <div class="modal-content">
-    <h3>Agregar factura manual</h3>
+  <div id="modalNuevaFactura" style="display:none">
+  <input id="addMesa" placeholder="Mesa">
 
-    <label>Mesa</label>
-    <input id="addMesa" type="text">
+  <select id="addMetodoPago">
+    <option value="efectivo">Efectivo</option>
+    <option value="tarjeta">Tarjeta</option>
+    <option value="transferencia">Transferencia</option>
+    <option value="nequi">Nequi</option>
+    <option value="daviplata">Daviplata</option>
+  </select>
 
-    <label>Método de pago</label>
-    <select id="addMetodoPago">
-      <option value="efectivo">Efectivo</option>
-      <option value="tarjeta">Tarjeta</option>
-      <option value="transferencia">Transferencia</option>
-      <option value="nequi">Nequi</option>
-      <option value="daviplata">Daviplata</option>
-    </select>
+  <input type="date" id="addFecha">
 
-    <label>Fecha</label>
-    <input id="addFecha" type="date">
+  <select id="selectProductos"></select>
+  <button id="btnAgregarCatalogo">Agregar producto</button>
 
-    <hr>
+  <div id="productosEditarContainer"></div>
 
-    <label>Producto</label>
-    <select id="addSelectProducto"></select>
-    <button id="btnAddProducto">Agregar producto</button>
+  <input id="editTotal" readonly>
 
-    <div id="addProductosContainer"></div>
-
-    <label>Total</label>
-    <input id="addTotal" readonly>
-
-    <br><br>
-    <button id="btnGuardarFactura">Guardar</button>
-    <button id="btnCancelarFactura">Cancelar</button>
+  <button id="btnGuardarNuevaFactura">Guardar</button>
+  <button id="btnCancelarNuevaFactura">Cancelar</button>
   </div>
-</div>
+
   <!-- 🧾 Modal de edición con scroll -->
   <div id="modalEditar" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
     <div style="background:#fff; padding:25px; border-radius:10px; width:450px; max-height:80vh; overflow-y:auto; position:relative; box-shadow:0 4px 12px rgba(0,0,0,0.3);">

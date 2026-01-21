@@ -18,21 +18,16 @@ const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 
 let ordenEditando = null;
 
-const btnAgregarFactura = document.getElementById("btnAgregarFactura");
-const modalAgregar = document.getElementById("modalAgregar");
-
+const btnNuevaFactura = document.getElementById("btnNuevaFactura");
+const modalNuevaFactura = document.getElementById("modalNuevaFactura");
 const addMesa = document.getElementById("addMesa");
 const addMetodoPago = document.getElementById("addMetodoPago");
 const addFecha = document.getElementById("addFecha");
-const addSelectProducto = document.getElementById("addSelectProducto");
-const addProductosContainer = document.getElementById("addProductosContainer");
-const addTotal = document.getElementById("addTotal");
+const btnGuardarNuevaFactura = document.getElementById("btnGuardarNuevaFactura");
+const btnCancelarNuevaFactura = document.getElementById("btnCancelarNuevaFactura");
 
-const btnAddProducto = document.getElementById("btnAddProducto");
-const btnGuardarFactura = document.getElementById("btnGuardarFactura");
-const btnCancelarFactura = document.getElementById("btnCancelarFactura");
+let creandoFactura = false;
 
-let itemsNuevaFactura = [];
 
 
 // === IMPRIMIR FACTURA (YA ESTÁ BIEN, PERO LA MANTENEMOS) ===
@@ -216,119 +211,6 @@ async function cargarCatalogo() {
   }
 }
 
-async function cargarCatalogoFactura() {
-  const res = await fetch(API_URL);
-  const data = await res.json();
-
-  const productos = Array.isArray(data) ? data : data.productos || [];
-
-  addSelectProducto.innerHTML = "";
-
-  productos.forEach(p => {
-    const prod = {
-      nombre: p.nombre,
-      precio: p.precio
-    };
-
-    const opt = document.createElement("option");
-    opt.value = JSON.stringify(prod);
-    opt.textContent = `${prod.nombre} - $${prod.precio}`;
-    addSelectProducto.appendChild(opt);
-  });
-}
-
-btnAgregarFactura.addEventListener("click", () => {
-  if (!fechaInput.value) {
-    return alert("Selecciona primero una fecha");
-  }
-
-  addFecha.value = fechaInput.value;
-  itemsNuevaFactura = [];
-  addProductosContainer.innerHTML = "";
-  addTotal.value = 0;
-
-  cargarCatalogoFactura();
-  modalAgregar.style.display = "flex";
-});
-
-btnAddProducto.addEventListener("click", () => {
-  const producto = JSON.parse(addSelectProducto.value);
-
-  itemsNuevaFactura.push({
-    nombre: producto.nombre,
-    precio: producto.precio,
-    cantidad: 1,
-    recomendaciones: ""
-  });
-
-  renderProductosNuevaFactura();
-});
-
-function renderProductosNuevaFactura() {
-  addProductosContainer.innerHTML = "";
-  let total = 0;
-
-  itemsNuevaFactura.forEach((item, index) => {
-    total += item.cantidad * item.precio;
-
-    const div = document.createElement("div");
-    div.innerHTML = `
-      ${item.nombre} 
-      <input type="number" min="1" value="${item.cantidad}">
-      <button>🗑</button>
-    `;
-
-    div.querySelector("input").addEventListener("input", e => {
-      item.cantidad = Number(e.target.value);
-      renderProductosNuevaFactura();
-    });
-
-    div.querySelector("button").addEventListener("click", () => {
-      itemsNuevaFactura.splice(index, 1);
-      renderProductosNuevaFactura();
-    });
-
-    addProductosContainer.appendChild(div);
-  });
-
-  addTotal.value = total;
-}
-
-btnGuardarFactura.addEventListener("click", async () => {
-  if (!addMesa.value || itemsNuevaFactura.length === 0) {
-    return alert("Faltan datos");
-  }
-
-  const payload = {
-    mesa: addMesa.value,
-    metodoPago: addMetodoPago.value,
-    fecha: addFecha.value,
-    items: itemsNuevaFactura
-  };
-
-  try {
-    const res = await fetch(API_BASE, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) throw new Error("Error creando factura");
-
-    modalAgregar.style.display = "none";
-    buscarOrdenesPorFecha(addFecha.value);
-    alert("Factura agregada correctamente");
-
-  } catch (err) {
-    alert("Error al crear factura");
-  }
-});
-
-btnCancelarFactura.addEventListener("click", () => {
-  modalAgregar.style.display = "none";
-});
-
-
 document.getElementById("btnAgregarCatalogo").addEventListener("click", () => {
   if (!selectProductos.value) return;
 
@@ -508,6 +390,72 @@ async function eliminarOrden(id) {
     alert("Error al eliminar");
   }
 }
+
+//AGREGAR FACTURA 
+
+btnNuevaFactura.addEventListener("click", () => {
+  if (!fechaInput.value) {
+    return alert("Selecciona una fecha primero");
+  }
+
+  creandoFactura = true;
+  itemsEditando = [];
+
+  addMesa.value = "";
+  addMetodoPago.value = "efectivo";
+  addFecha.value = fechaInput.value;
+
+  contenedorProductos.innerHTML = "";
+  editTotal.value = 0;
+
+  cargarCatalogo();       // 🔥 MISMA función que ya funciona
+  renderProductos();
+  calcularTotal();
+
+  modalNuevaFactura.style.display = "flex";
+});
+
+btnGuardarNuevaFactura.addEventListener("click", async () => {
+  if (!creandoFactura) return;
+
+  if (!addMesa.value || itemsEditando.length === 0) {
+    return alert("Faltan datos");
+  }
+
+  const payload = {
+    mesa: addMesa.value,
+    metodoPago: addMetodoPago.value,
+    fecha: addFecha.value,
+    items: itemsEditando,
+    total: Number(editTotal.value)
+  };
+
+  try {
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Error creando factura");
+
+    modalNuevaFactura.style.display = "none";
+    creandoFactura = false;
+
+    buscarOrdenesPorFecha(addFecha.value);
+    alert("Factura creada correctamente");
+
+  } catch (err) {
+    console.error(err);
+    alert("Error al crear factura");
+  }
+});
+
+btnCancelarNuevaFactura.addEventListener("click", () => {
+  modalNuevaFactura.style.display = "none";
+  creandoFactura = false;
+});
+
 
 // Cerrar sesión
 logoutBtn.addEventListener("click", () => {
