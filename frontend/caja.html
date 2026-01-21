@@ -69,15 +69,6 @@
       margin-top: 15px;
       text-align: right;
     }
-    
-    #productosEditarContainer {
-  max-height: 220px;        /* ajusta la altura a tu gusto */
-  overflow-y: auto;         /* scroll vertical */
-  padding-right: 6px;
-  margin-top: 8px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-}
   </style>
 </head>
 <body>
@@ -101,30 +92,6 @@
   </div>
   <button id="btnNuevaFactura">➕ Nueva factura</button>
 
-    <div id="modalNuevaFactura" style="display:none">
-  <input id="addMesa" placeholder="Mesa">
-
-  <select id="addMetodoPago">
-    <option value="efectivo">Efectivo</option>
-    <option value="tarjeta">Tarjeta</option>
-    <option value="transferencia">Transferencia</option>
-    <option value="nequi">Nequi</option>
-    <option value="daviplata">Daviplata</option>
-  </select>
-
-  <input type="date" id="addFecha">
-
-  <select id="selectProductos"></select>
-  <button id="btnAgregarCatalogo">Agregar producto</button>
-
-  <div id="productosEditarContainer"></div>
-
-  <input id="editTotal" readonly>
-
-  <button id="btnGuardarNuevaFactura">Guardar</button>
-  <button id="btnCancelarNuevaFactura">Cancelar</button>
-  </div>
-
   <table id="tablaOrdenes">
     <thead>
       <tr>
@@ -140,8 +107,7 @@
   </table>
   <div class="total" id="totalDia"></div>
   <div id="totalesMetodoPago"></div>
-
-
+  
   <!-- 🧾 Modal de edición con scroll -->
   <div id="modalEditar" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999;">
     <div style="background:#fff; padding:25px; border-radius:10px; width:450px; max-height:80vh; overflow-y:auto; position:relative; box-shadow:0 4px 12px rgba(0,0,0,0.3);">
