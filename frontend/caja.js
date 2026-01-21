@@ -19,6 +19,27 @@ const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 let ordenEditando = null;
 
 
+// ================================
+// MODAL NUEVA FACTURA (AISLADO)
+// ================================
+
+const nfModal = document.getElementById("modalNuevaFactura");
+
+const nfMesa = document.getElementById("addMesa");
+const nfMetodoPago = document.getElementById("addMetodoPago");
+const nfFecha = document.getElementById("addFecha");
+
+const nfSelectProductos = document.getElementById("selectProductos");
+const nfProductosContainer = document.getElementById("productosEditarContainer");
+const nfTotal = document.getElementById("editTotal");
+
+const nfBtnNuevaFactura = document.getElementById("btnNuevaFactura");
+const nfBtnAgregarProducto = document.getElementById("btnAgregarCatalogo");
+const nfBtnGuardar = document.getElementById("btnGuardarNuevaFactura");
+const nfBtnCancelar = document.getElementById("btnCancelarNuevaFactura");
+
+let nfItems = [];
+
 // === IMPRIMIR FACTURA (YA ESTÁ BIEN, PERO LA MANTENEMOS) ===
 async function imprimirFactura(orderId) {
   if (!confirm("¿Imprimir factura para esta orden?")) return;
@@ -379,6 +400,182 @@ async function eliminarOrden(id) {
     alert("Error al eliminar");
   }
 }
+
+
+//NUEVA FACTURA
+async function nfCargarCatalogo() {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("Error cargando catálogo");
+
+    const data = await res.json();
+    const productos = Array.isArray(data) ? data : data.productos || [];
+
+    nfSelectProductos.innerHTML = "";
+
+    if (productos.length === 0) {
+      const opt = document.createElement("option");
+      opt.textContent = "No hay productos";
+      nfSelectProductos.appendChild(opt);
+      return;
+    }
+
+    productos.forEach(p => {
+      const producto = {
+        nombre: p.nombre || p.name || p.producto,
+        precio: p.precio || p.price || p.valor || 0
+      };
+
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(producto);
+      opt.textContent = `${producto.nombre} - $${producto.precio}`;
+      nfSelectProductos.appendChild(opt);
+    });
+
+  } catch (err) {
+    console.error("❌ Error catálogo nueva factura:", err);
+  }
+}
+
+
+nfBtnNuevaFactura.addEventListener("click", () => {
+  if (!fechaInput.value) {
+    return alert("Selecciona una fecha primero");
+  }
+
+  nfItems = [];
+
+  nfMesa.value = "";
+  nfMetodoPago.value = "efectivo";
+  nfFecha.value = fechaInput.value;
+  nfTotal.value = 0;
+
+  nfProductosContainer.innerHTML = "";
+
+  nfCargarCatalogo();
+  nfRenderProductos();
+
+  nfModal.style.display = "flex";
+});
+
+
+nfBtnAgregarProducto.addEventListener("click", () => {
+  if (!nfSelectProductos.value) return;
+
+  const producto = JSON.parse(nfSelectProductos.value);
+
+  const existente = nfItems.find(p => p.nombre === producto.nombre);
+
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    nfItems.push({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: 1,
+      recomendaciones: ""
+    });
+  }
+
+  nfRenderProductos();
+  nfCalcularTotal();
+});
+
+
+function nfRenderProductos() {
+  nfProductosContainer.innerHTML = "";
+
+  nfItems.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "8px";
+    div.style.marginBottom = "6px";
+
+    const nombre = document.createElement("input");
+    nombre.value = item.nombre;
+    nombre.oninput = e => nfItems[index].nombre = e.target.value;
+
+    const cantidad = document.createElement("input");
+    cantidad.type = "number";
+    cantidad.min = 1;
+    cantidad.value = item.cantidad;
+    cantidad.oninput = e => {
+      nfItems[index].cantidad = Number(e.target.value);
+      nfCalcularTotal();
+    };
+
+    const precio = document.createElement("input");
+    precio.type = "number";
+    precio.min = 0;
+    precio.value = item.precio;
+    precio.oninput = e => {
+      nfItems[index].precio = Number(e.target.value);
+      nfCalcularTotal();
+    };
+
+    const rec = document.createElement("input");
+    rec.placeholder = "Recomendaciones";
+    rec.value = item.recomendaciones || "";
+    rec.oninput = e => nfItems[index].recomendaciones = e.target.value;
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "🗑";
+    btnEliminar.onclick = () => {
+      nfItems.splice(index, 1);
+      nfRenderProductos();
+      nfCalcularTotal();
+    };
+
+    div.append(nombre, cantidad, precio, rec, btnEliminar);
+    nfProductosContainer.appendChild(div);
+  });
+}
+
+function nfCalcularTotal() {
+  nfTotal.value = nfItems.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+}
+
+nfBtnGuardar.addEventListener("click", async () => {
+  if (!nfMesa.value || nfItems.length === 0) {
+    return alert("Faltan datos");
+  }
+
+  const payload = {
+    mesa: nfMesa.value,
+    metodoPago: nfMetodoPago.value,
+    fecha: nfFecha.value,
+    items: nfItems,
+    total: Number(nfTotal.value)
+  };
+
+  try {
+    const res = await fetch(API_BASE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error("Error creando factura");
+
+    nfModal.style.display = "none";
+    buscarOrdenesPorFecha(nfFecha.value);
+
+    alert("✅ Factura creada correctamente");
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error al crear factura");
+  }
+});
+
+nfBtnCancelar.addEventListener("click", () => {
+  nfModal.style.display = "none";
+  nfItems = [];
+});
+
 
 // Cerrar sesión
 logoutBtn.addEventListener("click", () => {
