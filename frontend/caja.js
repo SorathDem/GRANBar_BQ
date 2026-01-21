@@ -18,15 +18,24 @@ const cancelarEdicionBtn = document.getElementById("cancelarEdicion");
 
 let ordenEditando = null;
 
-const btnNuevaFactura = document.getElementById("btnNuevaFactura");
+//NUEVA FACTURA 
 const modalNuevaFactura = document.getElementById("modalNuevaFactura");
+
 const addMesa = document.getElementById("addMesa");
 const addMetodoPago = document.getElementById("addMetodoPago");
 const addFecha = document.getElementById("addFecha");
+
+const addSelectProductos = document.getElementById("selectProductos");
+const addProductosContainer = document.getElementById("productosEditarContainer");
+const addTotal = document.getElementById("editTotal");
+
+const btnNuevaFactura = document.getElementById("btnNuevaFactura");
+const btnAgregarProductoFactura = document.getElementById("btnAgregarCatalogo");
 const btnGuardarNuevaFactura = document.getElementById("btnGuardarNuevaFactura");
 const btnCancelarNuevaFactura = document.getElementById("btnCancelarNuevaFactura");
 
-let creandoFactura = false;
+let itemsNuevaFactura = [];
+
 
 
 
@@ -393,32 +402,148 @@ async function eliminarOrden(id) {
 
 //AGREGAR FACTURA 
 
+async function cargarCatalogoNuevaFactura() {
+  try {
+    const res = await fetch(API_URL);
+
+    if (!res.ok) throw new Error("Error cargando catálogo");
+
+    const data = await res.json();
+    const productos = Array.isArray(data) ? data : data.productos || [];
+
+    addSelectProductos.innerHTML = "";
+
+    if (productos.length === 0) {
+      const opt = document.createElement("option");
+      opt.textContent = "No hay productos";
+      addSelectProductos.appendChild(opt);
+      return;
+    }
+
+    productos.forEach(p => {
+      const producto = {
+        nombre: p.nombre || p.name || p.producto,
+        precio: p.precio || p.price || p.valor || 0
+      };
+
+      const opt = document.createElement("option");
+      opt.value = JSON.stringify(producto);
+      opt.textContent = `${producto.nombre} - $${producto.precio}`;
+      addSelectProductos.appendChild(opt);
+    });
+
+  } catch (error) {
+    console.error("❌ Error catálogo nueva factura:", error);
+  }
+}
+
+
 btnNuevaFactura.addEventListener("click", () => {
   if (!fechaInput.value) {
     return alert("Selecciona una fecha primero");
   }
 
-  creandoFactura = true;
-  itemsEditando = [];
+  itemsNuevaFactura = [];
 
   addMesa.value = "";
   addMetodoPago.value = "efectivo";
   addFecha.value = fechaInput.value;
+  addTotal.value = 0;
 
-  contenedorProductos.innerHTML = "";
-  editTotal.value = 0;
+  addProductosContainer.innerHTML = "";
 
-  cargarCatalogo();       // 🔥 MISMA función que ya funciona
-  renderProductos();
-  calcularTotal();
+  cargarCatalogoNuevaFactura();
+  renderProductosNuevaFactura();
 
   modalNuevaFactura.style.display = "flex";
 });
 
-btnGuardarNuevaFactura.addEventListener("click", async () => {
-  if (!creandoFactura) return;
+btnAgregarProductoFactura.addEventListener("click", () => {
+  if (!addSelectProductos.value) return;
 
-  if (!addMesa.value || itemsEditando.length === 0) {
+  const producto = JSON.parse(addSelectProductos.value);
+
+  const existente = itemsNuevaFactura.find(p => p.nombre === producto.nombre);
+
+  if (existente) {
+    existente.cantidad++;
+  } else {
+    itemsNuevaFactura.push({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad: 1,
+      recomendaciones: ""
+    });
+  }
+
+  renderProductosNuevaFactura();
+  calcularTotalNuevaFactura();
+});
+
+function renderProductosNuevaFactura() {
+  addProductosContainer.innerHTML = "";
+
+  itemsNuevaFactura.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "8px";
+    div.style.marginBottom = "6px";
+
+    const inputNombre = document.createElement("input");
+    inputNombre.value = item.nombre;
+    inputNombre.addEventListener("input", e => {
+      itemsNuevaFactura[index].nombre = e.target.value;
+    });
+
+    const inputCantidad = document.createElement("input");
+    inputCantidad.type = "number";
+    inputCantidad.min = 1;
+    inputCantidad.value = item.cantidad;
+    inputCantidad.addEventListener("input", e => {
+      itemsNuevaFactura[index].cantidad = Number(e.target.value);
+      calcularTotalNuevaFactura();
+    });
+
+    const inputPrecio = document.createElement("input");
+    inputPrecio.type = "number";
+    inputPrecio.min = 0;
+    inputPrecio.value = item.precio;
+    inputPrecio.addEventListener("input", e => {
+      itemsNuevaFactura[index].precio = Number(e.target.value);
+      calcularTotalNuevaFactura();
+    });
+
+    const inputRec = document.createElement("input");
+    inputRec.placeholder = "Recomendaciones";
+    inputRec.value = item.recomendaciones || "";
+    inputRec.addEventListener("input", e => {
+      itemsNuevaFactura[index].recomendaciones = e.target.value;
+    });
+
+    const btnEliminar = document.createElement("button");
+    btnEliminar.textContent = "🗑";
+    btnEliminar.addEventListener("click", () => {
+      itemsNuevaFactura.splice(index, 1);
+      renderProductosNuevaFactura();
+      calcularTotalNuevaFactura();
+    });
+
+    div.append(inputNombre, inputCantidad, inputPrecio, inputRec, btnEliminar);
+    addProductosContainer.appendChild(div);
+  });
+}
+
+
+function calcularTotalNuevaFactura() {
+  const total = itemsNuevaFactura.reduce(
+    (sum, item) => sum + item.cantidad * item.precio,
+    0
+  );
+  addTotal.value = total;
+}
+
+btnGuardarNuevaFactura.addEventListener("click", async () => {
+  if (!addMesa.value || itemsNuevaFactura.length === 0) {
     return alert("Faltan datos");
   }
 
@@ -426,8 +551,8 @@ btnGuardarNuevaFactura.addEventListener("click", async () => {
     mesa: addMesa.value,
     metodoPago: addMetodoPago.value,
     fecha: addFecha.value,
-    items: itemsEditando,
-    total: Number(editTotal.value)
+    items: itemsNuevaFactura,
+    total: Number(addTotal.value)
   };
 
   try {
@@ -440,21 +565,21 @@ btnGuardarNuevaFactura.addEventListener("click", async () => {
     if (!res.ok) throw new Error("Error creando factura");
 
     modalNuevaFactura.style.display = "none";
-    creandoFactura = false;
-
     buscarOrdenesPorFecha(addFecha.value);
-    alert("Factura creada correctamente");
+
+    alert("✅ Factura creada correctamente");
 
   } catch (err) {
     console.error(err);
-    alert("Error al crear factura");
+    alert("❌ Error al crear factura");
   }
 });
 
 btnCancelarNuevaFactura.addEventListener("click", () => {
   modalNuevaFactura.style.display = "none";
-  creandoFactura = false;
+  itemsNuevaFactura = [];
 });
+
 
 
 // Cerrar sesión

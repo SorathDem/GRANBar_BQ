@@ -69,6 +69,15 @@
       margin-top: 15px;
       text-align: right;
     }
+    
+    #productosEditarContainer {
+  max-height: 220px;        /* ajusta la altura a tu gusto */
+  overflow-y: auto;         /* scroll vertical */
+  padding-right: 6px;
+  margin-top: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
   </style>
 </head>
 <body>
@@ -91,7 +100,7 @@
     <button id="reporteMensual">🗓️ Reporte Mensual (PDF)</button>-->
   </div>
   <button id="btnNuevaFactura">➕ Nueva factura</button>
-  
+
     <div id="modalNuevaFactura" style="display:none">
   <input id="addMesa" placeholder="Mesa">
 
