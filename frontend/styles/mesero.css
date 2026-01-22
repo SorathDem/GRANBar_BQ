@@ -169,7 +169,7 @@ main {
 
 .menos,
 .mas {
-  font-size: 20px;        /* tamaño del símbolo */
+  font-size: 40px;        /* tamaño del símbolo */
   padding: 20px 30px;      /* tamaño del botón */
   min-width: 40px;
   height: 40px;
