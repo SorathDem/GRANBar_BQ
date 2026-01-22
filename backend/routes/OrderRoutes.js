@@ -147,43 +147,27 @@ router.post("/cerrar-caja", async (req, res) => {
       return res.status(400).json({ error: "Falta la fecha" });
     }
 
-    // 🧹 ELIMINAR CAJA EXISTENTE (SI YA FUE CERRADA)
-    await Caja.deleteOne({ fecha });
-
-    // 📅 RANGO DEL DÍA (COLOMBIA)
-    const { inicio, fin } = rangoFechaColombia(fecha);
-
-    // 📦 ÓRDENES DEL DÍA
-    const ordenes = await Order.find({
-      fecha: {
-        $gte: inicio,
-        $lte: fin
-      }
-    });
+    // ✅ BUSCAR POR STRING
+    const ordenes = await Order.find({ fecha });
 
     if (ordenes.length === 0) {
       return res.status(404).json({ error: "No hay órdenes para esa fecha" });
     }
 
-    const totalDia = ordenes.reduce(
-      (sum, o) => sum + (o.total || 0),
-      0
-    );
+    const totalDia = ordenes.reduce((sum, o) => sum + (o.total || 0), 0);
 
-    // 💾 NUEVO CIERRE DE CAJA
+    // 🔁 BORRAR CIERRE PREVIO SI EXISTE
+    await Caja.findOneAndDelete({ fecha });
+
     const caja = new Caja({
       fecha,
       totalDia,
-      cantidadOrdenes: ordenes.length
+      cantidadOrdenes: ordenes.length,
     });
 
     await caja.save();
 
-    res.json({
-      message: "Caja cerrada correctamente",
-      caja
-    });
-
+    res.json({ message: "Caja cerrada correctamente", caja });
   } catch (error) {
     console.error("💥 Error cerrando caja:", error);
     res.status(500).json({ error: "Error al cerrar la caja" });
