@@ -2,8 +2,7 @@
 import express from "express";
 import Order from "../models/Order.js";
 import Caja from "../models/caja.js";
-import {descontarStockYDetectarBajo}  from "../services/stockService.js";
-
+import { descontarStockYDetectarBajo } from "../services/stockServices.js";
 
 const router = express.Router();
 
@@ -19,6 +18,7 @@ router.post("/", async (req, res) => {
     if (items.length === 0) {
       return res.status(400).json({ error: "No hay productos en la orden" });
     }
+
 
     let total = 0;
 
