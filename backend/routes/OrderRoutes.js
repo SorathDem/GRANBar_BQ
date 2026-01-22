@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
       total += cantidad * precio;
 
       return {
-        productId: p._id || null,
+        productId: item.productId,
         tipo: p.tipo || "",
         nombre: p.nombre || "Producto sin nombre",
         cantidad,
@@ -36,6 +36,8 @@ router.post("/", async (req, res) => {
         recomendaciones: p.recomendaciones || ""
       };
     });
+
+     const alertasStockBajo = await descontarStockYDetectarBajo(itemsProcesados);
 
     const nuevaOrden = new Order({
       mesa,
@@ -47,7 +49,6 @@ router.post("/", async (req, res) => {
 
     await nuevaOrden.save();
 
-    const alertasStockBajo = await descontarStockYDetectarBajo(itemsProcesados);
 
     res.status(201).json({
       mensaje: "Orden creada con éxito",

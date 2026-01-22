@@ -422,7 +422,7 @@ async function nfCargarCatalogo() {
 
     productos.forEach(p => {
       const producto = {
-        productId: p._id,
+        _id: p._id,
         nombre: p.nombre || p.name || p.producto,
         precio: p.precio || p.price || p.valor || 0
       };
@@ -471,7 +471,7 @@ nfBtnAgregarProducto.addEventListener("click", () => {
     existente.cantidad++;
   } else {
     nfItems.push({
-      productId: producto.productId,
+      productId: producto._id,
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: 1,
@@ -546,6 +546,7 @@ nfBtnGuardar.addEventListener("click", async () => {
   }
 
   const payload = {
+    productId: p.productId,
     mesa: nfMesa.value,
     metodoPago: nfMetodoPago.value,
     fecha: nfFecha.value,
