@@ -2,7 +2,7 @@
 import express from "express";
 import Order from "../models/Order.js";
 import Caja from "../models/caja.js";
-import { descontarStockYDetectarBajo } from "../services/stockServices.js";
+import {descontarStockYDetectarBajo} from "../services/stockService.js";
 
 const router = express.Router();
 
