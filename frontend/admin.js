@@ -43,6 +43,18 @@ async function loadProductos() {
   } catch (err) {
     console.error("💥 Error cargando productos:", err);
   }
+
+  const productosBajoStock = productos.filter(p => p.stock <= 5);
+
+  if (productosBajoStock.length > 0) {
+    const nombres = productosBajoStock
+      .map(p => `${p.name} (${p.stock})`)
+      .join("\n");
+
+    alert(
+      `⚠️ Productos con stock bajo:\n\n${nombres}`
+    );
+  }
 }
 
 // 🔹 Renderizar productos
