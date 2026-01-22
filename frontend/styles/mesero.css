@@ -167,6 +167,14 @@ main {
   border-bottom: 1px solid #eee;
 }
 
+.menos,
+.mas {
+  font-size: 20px;        /* tamaño del símbolo */
+  padding: 6px 12px;      /* tamaño del botón */
+  min-width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
 /* =======================
    MESA
 ======================= */
@@ -177,6 +185,7 @@ main {
   gap: 10px;
   margin-top: 14px;
 }
+
 
 .mesa-input label {
   font-size: 1.2rem;
