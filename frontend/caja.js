@@ -24,7 +24,6 @@ let ordenEditando = null;
 // ================================
 
 const nfModal = document.getElementById("modalNuevaFactura");
-const nfId = document.getElementById("addId");
 const nfMesa = document.getElementById("addMesa");
 const nfMetodoPago = document.getElementById("addMetodoPago");
 const nfFecha = document.getElementById("addFecha");
@@ -546,7 +545,6 @@ nfBtnGuardar.addEventListener("click", async () => {
   }
 
   const payload = {
-    productId: nfId.productId,
     mesa: nfMesa.value,
     metodoPago: nfMetodoPago.value,
     fecha: nfFecha.value,
