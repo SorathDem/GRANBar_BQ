@@ -64,10 +64,20 @@ function renderProductos(productos) {
   productos.forEach((p) => {
     const row = document.createElement("tr");
 
+    let stockClass = "stock-ok";
+
+    if (p.stock <= 5) {
+      stockClass = "stock-danger";
+    } else if (p.stock <= 10) {
+      stockClass = "stock-warning";
+    }
+
     row.innerHTML = `
       <td>${p.name}</td>
       <td>${p.price}</td>
-      <td>${p.stock}</td>
+      <td class="${stockClass}">
+        ${p.stock}
+      </td>
       <td>
         <button class="btn-edit">✏️</button>
         <button class="btn-delete">🗑️</button>

@@ -224,3 +224,19 @@ button.delete-btn:hover {
 #closeModal:hover {
   background-color: #b2bec3;
 }
+
+.stock-ok {
+  background-color: white;
+}
+
+.stock-warning {
+  background-color: #fff3cd; /* amarillo suave */
+  color: #856404;
+  font-weight: bold;
+}
+
+.stock-danger {
+  background-color: #f8d7da; /* rojo suave */
+  color: #721c24;
+  font-weight: bold;
+}
