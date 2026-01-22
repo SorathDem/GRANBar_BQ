@@ -6,6 +6,10 @@ import {descontarStockYDetectarBajo} from "../services/stockService.js";
 
 const router = express.Router();
 
+const fechaColombia = new Date().toLocaleDateString("en-CA", {
+  timeZone: "America/Bogota"
+});
+
 // ✅ CREAR ORDEN - VERSIÓN CORREGIDA Y FINAL
 router.post("/", async (req, res) => {
   try {
@@ -62,9 +66,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-const fechaColombia = new Date().toLocaleDateString("en-CA", {
-  timeZone: "America/Bogota"
-});
 
 function rangoFechaColombia(fechaYYYYMMDD) {
   const inicio = new Date(
