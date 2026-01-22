@@ -24,6 +24,7 @@ let ordenEditando = null;
 // ================================
 
 const nfModal = document.getElementById("modalNuevaFactura");
+
 const nfMesa = document.getElementById("addMesa");
 const nfMetodoPago = document.getElementById("addMetodoPago");
 const nfFecha = document.getElementById("addFecha");
@@ -421,7 +422,6 @@ async function nfCargarCatalogo() {
 
     productos.forEach(p => {
       const producto = {
-        _id: p._id,
         nombre: p.nombre || p.name || p.producto,
         precio: p.precio || p.price || p.valor || 0
       };
@@ -470,7 +470,6 @@ nfBtnAgregarProducto.addEventListener("click", () => {
     existente.cantidad++;
   } else {
     nfItems.push({
-      productId: producto._id,
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: 1,

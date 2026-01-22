@@ -6,10 +6,6 @@ import {descontarStockYDetectarBajo} from "../services/stockService.js";
 
 const router = express.Router();
 
-const fechaColombia = new Date().toLocaleDateString("en-CA", {
-  timeZone: "America/Bogota"
-});
-
 // ✅ CREAR ORDEN - VERSIÓN CORREGIDA Y FINAL
 router.post("/", async (req, res) => {
   try {
@@ -32,7 +28,7 @@ router.post("/", async (req, res) => {
       total += cantidad * precio;
 
       return {
-        productId: item.productId,
+        productId: p._id || null,
         tipo: p.tipo || "",
         nombre: p.nombre || "Producto sin nombre",
         cantidad,
@@ -40,8 +36,6 @@ router.post("/", async (req, res) => {
         recomendaciones: p.recomendaciones || ""
       };
     });
-
-     const alertasStockBajo = await descontarStockYDetectarBajo(itemsProcesados);
 
     const nuevaOrden = new Order({
       mesa,
@@ -53,6 +47,7 @@ router.post("/", async (req, res) => {
 
     await nuevaOrden.save();
 
+    const alertasStockBajo = await descontarStockYDetectarBajo(itemsProcesados);
 
     res.status(201).json({
       mensaje: "Orden creada con éxito",
@@ -66,6 +61,9 @@ router.post("/", async (req, res) => {
   }
 });
 
+const fechaColombia = new Date().toLocaleDateString("en-CA", {
+  timeZone: "America/Bogota"
+});
 
 function rangoFechaColombia(fechaYYYYMMDD) {
   const inicio = new Date(
