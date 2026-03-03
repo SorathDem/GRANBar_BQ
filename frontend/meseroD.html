@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel del Mesero</title>
+  <link rel="stylesheet" href="styles/mesero.css" />
+</head>
+<body>
+  <header>
+    <h1>Panel del Mesero</h1>
+    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+    <button id="button" class="btn-logout"></button>
+  </header>
+
+  <input 
+    type="text" 
+    id="buscador" 
+    placeholder="🔍 Buscar producto o categoría..."
+    class="buscador"
+  />
+
+  <main>
+    <!-- Sección de productos -->
+    <section class="productos">
+      <h2>Productos disponibles</h2>
+      <div class="productos-scroll" id="productos-container"></div>
+    </section>
+
+    <!-- Sección de orden -->
+    <section class="orden">
+      <h2>Orden actual</h2>
+
+      <div id="orden-lista" class="orden-lista"></div>
+
+      <!-- Número de mesa -->
+      <div class="mesa-input">
+        <label for="mesa">Mesa:</label>
+        <select id="mesa"></select>
+      </div>
+
+      <button id="enviarOrdenBtn" class="btn-enviar">Enviar orden</button>
+    </section>
+  </main>
+
+  <!-- ✅ Solo importamos el JS (toda la lógica está ahí) -->
+  <script type="module" src="./meseroD.js"></script>
+</body>
+</html>
