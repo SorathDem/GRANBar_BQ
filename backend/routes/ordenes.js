@@ -1,9 +1,9 @@
-const express = require("express");
+import express from "express";
+import Orden from "../models/Orden.js";
+
 const router = express.Router();
-const Orden = require("../models/orden");
 
-
-// 🔹 Crear orden
+// Crear orden
 router.post("/", async (req, res) => {
   try {
     const nuevaOrden = new Orden(req.body);
@@ -14,35 +14,29 @@ router.post("/", async (req, res) => {
   }
 });
 
-
-// 🔹 Obtener solo pendientes (para meseroAcep)
+// Obtener pendientes
 router.get("/pendientes", async (req, res) => {
   try {
-    const ordenes = await Orden.find({ estado: "pendiente" })
-      .sort({ createdAt: 1 });
-
+    const ordenes = await Orden.find({ estado: "pendiente" });
     res.json(ordenes);
   } catch (error) {
     res.status(500).json({ error: "Error obteniendo órdenes" });
   }
 });
 
-
-// 🔹 Cambiar estado (plato listo o cancelar)
+// Cambiar estado
 router.patch("/:id", async (req, res) => {
   try {
     const { estado } = req.body;
-
-    const ordenActualizada = await Orden.findByIdAndUpdate(
+    const actualizada = await Orden.findByIdAndUpdate(
       req.params.id,
       { estado },
       { new: true }
     );
-
-    res.json(ordenActualizada);
+    res.json(actualizada);
   } catch (error) {
     res.status(500).json({ error: "Error actualizando orden" });
   }
 });
 
-module.exports = router;
+export default router;
