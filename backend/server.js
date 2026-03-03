@@ -37,14 +37,12 @@ app.use(
   })
 );
 
-const ordenRoutes = require("./routes/ordenes");
-
 // Middleware JSON
 app.use(express.json());
 
 // === Rutas de la API ===
 app.use("/api/auth", AuthRoutes);
-app.use("/api/ordenesD", ordenRoutes);
+app.use("/api/ordenesD", ordenes);
 app.use("/api/productos", ProductRoutes);
 app.use("/api/ordenes", OrderRoutes);
 app.use("/api/reportes", ReportRoutes);
