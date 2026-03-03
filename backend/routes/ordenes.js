@@ -1,12 +1,12 @@
 import express from "express";
-import Orden from "../models/orden.js";
+import orden from "../models/orden.js"
 
 const router = express.Router();
 
 // Crear orden
 router.post("/", async (req, res) => {
   try {
-    const nuevaOrden = new Orden(req.body);
+    const nuevaOrden = new orden(req.body);
     const guardada = await nuevaOrden.save();
     res.status(201).json({ orden: guardada });
   } catch (error) {
@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
 // Obtener pendientes
 router.get("/pendientes", async (req, res) => {
   try {
-    const ordenes = await Orden.find({ estado: "pendiente" });
+    const ordenes = await orden.find({ estado: "pendiente" });
     res.json(ordenes);
   } catch (error) {
     res.status(500).json({ error: "Error obteniendo órdenes" });
@@ -28,7 +28,7 @@ router.get("/pendientes", async (req, res) => {
 router.patch("/:id", async (req, res) => {
   try {
     const { estado } = req.body;
-    const actualizada = await Orden.findByIdAndUpdate(
+    const actualizada = await orden.findByIdAndUpdate(
       req.params.id,
       { estado },
       { new: true }
