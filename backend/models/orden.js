@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema({
   _id: String,
@@ -26,4 +26,6 @@ const ordenSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Orden", ordenSchema, "ordenes");
+const Orden = mongoose.model("Orden", ordenSchema, "ordenes");
+
+export default Orden;
