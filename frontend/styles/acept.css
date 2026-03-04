@@ -1,6 +1,10 @@
 /* =======================
    TITULO PAGINA
 ======================= */
+* {
+  box-sizing: border-box;
+}
+
 h1 {
   text-align: center;
   margin: 35px 0;
