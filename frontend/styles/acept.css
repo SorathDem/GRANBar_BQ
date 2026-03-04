@@ -78,7 +78,7 @@ header nav a:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding-bottom: 40px;
+  padding-bottom: 100px;
 }
 
 /* =======================
@@ -87,7 +87,7 @@ header nav a:hover {
 .orden-card {
   background: white;
   border-radius: 16px;
-  padding: 22px;
+  padding: 80px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   border-left: 6px solid #0d6efd;
   transition: 0.3s;
