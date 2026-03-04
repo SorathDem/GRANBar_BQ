@@ -29,7 +29,8 @@ function renderOrdenes(lista) {
     const card = document.createElement("div");
     card.classList.add("orden-card");
 
-    card.innerHTML = `
+card.innerHTML = `
+  <div class="contenido">
       <h3>Mesa ${orden.mesa}</h3>
       <p><strong>Estado:</strong> ${orden.estado}</p>
 
@@ -42,13 +43,13 @@ function renderOrdenes(lista) {
           </li>
         `).join("")}
       </ul>
+  </div>
 
-      <div class="botones">
-        <button class="realizado">Realizado</button>
-        <button class="cancelar">Cancelar</button>
-      </div>
-    `;
-
+  <div class="botones">
+      <button class="realizado">Realizado</button>
+      <button class="cancelar">Cancelar</button>
+  </div>
+`;
     // 🔹 Botón Realizado
     card.querySelector(".realizado").addEventListener("click", async () => {
       await eliminarOrden(orden._id);

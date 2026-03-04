@@ -74,7 +74,7 @@ header nav a:hover {
 ======================= */
 #ordenesContainer {
   width: 75%;              /* más angosto */
-  max-width: 900px;        /* límite elegante */
+  max-width: 2000px;        /* límite elegante */
   margin: 50px auto;       /* centrado vertical */
   display: flex;
   flex-direction: column;
@@ -88,11 +88,28 @@ header nav a:hover {
 .orden-card {
   background: white;
   border-radius: 20px;
-  padding: 60px 55px;        /* más espacio interno */
+  padding: 50px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
   border-left: 10px solid #0d6efd;
   transition: 0.3s;
-  font-size: 22px;           /* 🔥 aumenta texto general */
+  font-size: 40px;
+
+  display: flex;               /* 🔥 IMPORTANTE */
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.orden-card .contenido {
+  flex: 1;
+}
+
+/* Botones a la derecha */
+.botones {
+  display: flex;
+  flex-direction: column;  /* uno debajo del otro */
+  gap: 20px;
+  min-width: 180px;
 }
 
 .orden-card:hover {
@@ -114,7 +131,7 @@ header nav a:hover {
 
 .orden-card li {
   margin-bottom: 18px;
-  font-size: 1.6rem;   /* 🔥 grande */
+  font-size: 3.6rem;   /* 🔥 grande */
 }
 .orden-card small {
   color: #666;
@@ -123,11 +140,6 @@ header nav a:hover {
 /* =======================
    BOTONES
 ======================= */
-.botones {
-  display: flex;
-  gap: 12px;
-  margin-top: 15px;
-}
 
 .botones button {
   padding: 18px 30px;
