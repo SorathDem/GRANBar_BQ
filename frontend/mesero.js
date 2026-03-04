@@ -134,7 +134,7 @@ enviarOrdenBtn.addEventListener("click", async () => {
       const data = await resp.json();
       console.log("Orden creada con éxito:", data);
 
-       await fetch(`${API_BASE}/duplicar`, {
+      await fetch("/api/ordenesD", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
