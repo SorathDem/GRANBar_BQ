@@ -69,10 +69,12 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Si no encuentra ruta API, devuelve frontend
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/login.html"));
-});
+
 
 // === Puerto dinámico (Render asigna uno) ===
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/login.html"));
+});
