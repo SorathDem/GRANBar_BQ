@@ -1,0 +1,163 @@
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* BODY */
+body {
+    background-color: #f2f4f7;
+    color: #333;
+}
+
+/* HEADER */
+header {
+    background: #2f3b3f;
+    padding: 15px 40px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 25px;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: #4da3ff;
+}
+
+#logoutBtn {
+    background-color: #e74c3c;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#logoutBtn:hover {
+    background-color: #c0392b;
+}
+
+/* TITULO */
+h1 {
+    text-align: center;
+    margin: 35px 0;
+    color: #1f7ecb;
+    font-size: 32px;
+}
+
+/* CONTENEDOR ORDENES */
+#ordenesContainer {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 50px;
+}
+
+/* TARJETA DE ORDEN */
+.orden-card {
+    background: white;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: 0.3s;
+    border-left: 6px solid #1f7ecb;
+}
+
+.orden-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+/* ENCABEZADO ORDEN */
+.orden-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.orden-header h3 {
+    color: #1f7ecb;
+}
+
+.estado {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.estado.pendiente {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.estado.lista {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* PRODUCTOS */
+.productos {
+    margin-top: 10px;
+    line-height: 1.7;
+}
+
+/* BOTONES */
+.acciones {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.btn-preparar {
+    background-color: #1f7ecb;
+}
+
+.btn-preparar:hover {
+    background-color: #1667a9;
+}
+
+.btn-listo {
+    background-color: #28a745;
+}
+
+.btn-listo:hover {
+    background-color: #1e7e34;
+}
+
+.btn-eliminar {
+    background-color: #e74c3c;
+}
+
+.btn-eliminar:hover {
+    background-color: #c0392b;
+}
