@@ -50,3 +50,9 @@ setInterval(cargarOrdenes, 4000);
 
 // 🔹 Inicializar
 cargarOrdenes();
+
+// 🔹 Cerrar sesión
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+});

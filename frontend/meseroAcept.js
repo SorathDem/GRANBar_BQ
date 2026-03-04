@@ -84,3 +84,8 @@ setInterval(cargarOrdenes, 4000);
 
 // 🔹 Inicializar
 cargarOrdenes();
+
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+});
