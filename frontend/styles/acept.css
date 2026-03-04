@@ -1,32 +1,26 @@
 /* =======================
-   TITULO PAGINA
+   HEADER COMPLETO
 ======================= */
 
-* {
-  box-sizing: border-box;
+header {
+  background: #212529;
+  color: white;
+  width: 100%;
+  padding: 18px 40px;
+  display: flex;
+  justify-content: center; /* centra el contenido interno */
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #f4f6f8;
-  color: #222;
+/* Contenedor interno del header (para que no quede pegado a los lados) */
+header nav {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
-h1 {
-  text-align: center;
-  margin: 35px 0;
-  color: #0d6efd;
-  font-size: 2.2rem;
-}
-
-header h1 {
-  font-size: 1.8rem;
-  margin: 0;
-  font-weight: 700;
-}
-
-/* NAV */
+/* Lista horizontal */
 header nav ul {
   list-style: none;
   display: flex;
@@ -36,7 +30,7 @@ header nav ul {
   padding: 0;
 }
 
-/* Links */
+/* Botones azules */
 header nav a {
   text-decoration: none;
   background: #0d6efd;
@@ -51,90 +45,20 @@ header nav a {
 header nav a:hover {
   background: #0b5ed7;
 }
-/* =======================
-   CONTENEDOR ORDENES
-======================= */
-#ordenesContainer {
-  max-width: 1000px;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding-bottom: 40px;
-}
 
-/* =======================
-   TARJETA ORDEN
-======================= */
-.orden-card {
-  background: white;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  border-left: 6px solid #0d6efd;
-  transition: 0.3s;
-}
-
-.orden-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 22px rgba(0,0,0,0.12);
-}
-
-.orden-card h3 {
-  margin-top: 0;
-  font-size: 1.6rem;
-  color: #0d6efd;
-}
-
-/* Lista productos */
-.orden-card ul {
-  padding-left: 20px;
-  margin: 15px 0;
-}
-
-.orden-card li {
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-
-.orden-card small {
-  color: #666;
-}
-
-/* =======================
-   BOTONES
-======================= */
-.botones {
-  display: flex;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.botones button {
-  padding: 10px 16px;
+/* Botón cerrar sesión */
+.btn-logout {
+  background: #dc3545;
   border: none;
-  border-radius: 8px;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 1rem;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;
 }
 
-/* Realizado */
-.realizado {
-  background: #28a745;
-  color: white;
-}
-
-.realizado:hover {
-  background: #218838;
-}
-
-/* Cancelar */
-.cancelar {
-  background: #dc3545;
-  color: white;
-}
-
-.cancelar:hover {
+.btn-logout:hover {
   background: #bb2d3b;
 }
