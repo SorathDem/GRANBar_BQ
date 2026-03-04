@@ -134,6 +134,12 @@ enviarOrdenBtn.addEventListener("click", async () => {
       const data = await resp.json();
       console.log("Orden creada con éxito:", data);
 
+       await fetch(`${API_BASE}/duplicar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
       mostrarNotificacion("Orden enviada a cocina", "#27ae60");
       orden = [];
       renderOrden();

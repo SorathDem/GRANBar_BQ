@@ -1,68 +1,86 @@
-import { API_BASED } from "./config.js";
+const API_ORDENES = "/api/ordenesD";
+const container = document.getElementById("ordenesContainer");
 
-const contenedor = document.getElementById("ordenes-container");
 
-async function cargarOrdenesPendientes() {
+// 🔹 Obtener órdenes
+async function cargarOrdenes() {
   try {
-    const resp = await fetch(API_BASED);
-    const data = await resp.json();
+    const resp = await fetch(API_ORDENES);
+    const ordenes = await resp.json();
 
-    const pendientes = data.filter(o => o.estado === "pendiente");
-
-    renderOrdenes(pendientes);
+    renderOrdenes(ordenes);
 
   } catch (error) {
     console.error("Error cargando órdenes:", error);
-  } 
+  }
 }
 
+
+// 🔹 Pintar órdenes en pantalla
 function renderOrdenes(lista) {
-  contenedor.innerHTML = "";
+  container.innerHTML = "";
+
+  if (lista.length === 0) {
+    container.innerHTML = "<p>No hay órdenes activas</p>";
+    return;
+  }
 
   lista.forEach(orden => {
-
     const card = document.createElement("div");
     card.classList.add("orden-card");
 
     card.innerHTML = `
       <h3>Mesa ${orden.mesa}</h3>
       <p><strong>Estado:</strong> ${orden.estado}</p>
+
       <ul>
-        ${orden.items.map(i =>
-          `<li>${i.nombre} x${i.cantidad}</li>`
-        ).join("")}
+        ${orden.items.map(item => `
+          <li>
+            ${item.nombre} x${item.cantidad}
+            <br>
+            <small>${item.recomendaciones || ""}</small>
+          </li>
+        `).join("")}
       </ul>
 
-      <button class="cancelar">Cancelar</button>
-      <button class="listo">Plato listo</button>
+      <div class="botones">
+        <button class="realizado">Realizado</button>
+        <button class="cancelar">Cancelar</button>
+      </div>
     `;
 
-    // 🔹 Botón cancelar
+    // 🔹 Botón Realizado
+    card.querySelector(".realizado").addEventListener("click", async () => {
+      await eliminarOrden(orden._id);
+      card.remove();
+    });
+
+    // 🔹 Botón Cancelar
     card.querySelector(".cancelar").addEventListener("click", async () => {
-      await cambiarEstado(orden._id, "cancelado");
+      await eliminarOrden(orden._id);
       card.remove();
     });
 
-    // 🔹 Botón plato listo
-    card.querySelector(".listo").addEventListener("click", async () => {
-      await cambiarEstado(orden._id, "listo");
-      card.remove();
-    });
-
-    contenedor.appendChild(card);
+    container.appendChild(card);
   });
 }
 
-async function cambiarEstado(id, nuevoEstado) {
+
+// 🔹 Eliminar orden de la colección
+async function eliminarOrden(id) {
   try {
-    await fetch(`${API_BASED}/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estado: nuevoEstado })
+    await fetch(`${API_ORDENES}/${id}`, {
+      method: "DELETE"
     });
   } catch (error) {
-    console.error("Error actualizando estado:", error);
+    console.error("Error eliminando orden:", error);
   }
 }
 
-cargarOrdenesPendientes();
+
+// 🔹 Actualizar cada 4 segundos
+setInterval(cargarOrdenes, 4000);
+
+
+// 🔹 Inicializar
+cargarOrdenes();
